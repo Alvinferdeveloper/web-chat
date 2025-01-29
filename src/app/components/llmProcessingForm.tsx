@@ -2,19 +2,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import { Sparkles, Cloud, Bot, Zap } from "lucide-react"
-const providers = [
-    { name: "OpenAI", icon: <Sparkles className="w-4 h-4" /> },
-    { name: "Google Cloud", icon: <Cloud className="w-4 h-4" /> },
-    { name: "Gemini", icon: <Bot className="w-4 h-4" /> },
-]
+import { Zap } from "lucide-react"
 
-const modelsByProvider = {
-    OpenAI: ["GPT-4", "GPT-3.5", "o1", "o1-mini"],
-    "Google Cloud": ["PaLM", "BERT", "T5"],
-    Gemini: ["Gemini Pro", "Gemini Ultra"],
+type provider = {
+    id: string,
+    name: string,
+    iconSrc: string
 }
-export default function LlmProcessingForm() {
+
+interface Props {
+    providers: provider[]
+}
+export default function LlmProcessingForm({ providers }: Props) {
     return (
         <form className="grid grid-cols-1 md:grid-cols-1 gap-4">
             <div>
@@ -24,15 +23,15 @@ export default function LlmProcessingForm() {
                         <SelectValue placeholder="Selecciona un proveedor" />
                     </SelectTrigger>
                     <SelectContent>
-                        {providers.map((provider) => (
-                            <SelectItem key={provider.name} value={provider.name}>
-                                <div className="flex items-center">
-                                    <Image src="/groq-logo.webp" alt="" width={20} height={20} />
-                                    <span className="ml-2">{provider.name}</span>
-                                </div>
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
+                  {providers.map((provider) => (
+                    <SelectItem key={provider.name} value={provider.name}>
+                      <div className="flex items-center">
+                        <Image src={provider.iconSrc} width={24} height={24} alt="provider icon" />
+                        <span className="ml-2">{provider.name}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
                 </Select>
             </div>
             <Input
