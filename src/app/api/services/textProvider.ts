@@ -16,7 +16,6 @@ export async function askModelUsingProviderCredentials({ createProvider, modelNa
     catch (err) {
         
         const error = err as { statusCode:number};
-        console.error(error.statusCode);
         if (error.statusCode === 401) {
             throw new Error("Invalid api key");
         }

@@ -1,6 +1,6 @@
 import { createGroq } from "@ai-sdk/groq";
 import { createOpenAI } from "@ai-sdk/openai";
-import { randomUUID } from "crypto";
+import { createGoogleGenerativeAI }  from "@ai-sdk/google"
 
 export const availableProviders = [
     {
@@ -15,6 +15,13 @@ export const availableProviders = [
         createProvider: createOpenAI,
         name: "OpenAI",
         model: "gpt-4o-mini",
+        iconSrc : "/chat-gpt.png"
+    },
+    {
+        id: "3",
+        createProvider:createGoogleGenerativeAI,
+        name: "Google",
+        model: "gemini-1.5-flash",
         iconSrc : "/chat-gpt.png"
     }
 ]

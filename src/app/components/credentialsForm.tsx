@@ -23,7 +23,7 @@ interface Props {
 export default function CredentialsForm({ providers }: Props){
     const [provider, setProvider] = useState(providers[0].id);
     const [apiKey, setApiKey] = useState('');
-    const { verifyCredentials, error, isProcessing }= useVerifyCredential()
+    const { verifyCredentials, error, isProcessing, answer }= useVerifyCredential()
     
     const handleClick = () => {
         verifyCredentials(provider, apiKey)
