@@ -4,11 +4,10 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { Zap, Loader2 } from "lucide-react"
-import useVerifyCredential from "../hooks/useVerifyCredential"
+import { Dispatch, SetStateAction } from "react"
 import { useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-
 
 type provider = {
     id: string,
@@ -17,16 +16,20 @@ type provider = {
 }
 
 interface Props {
-    providers: provider[]
+    providers: provider[],
+    getWebSummary: (provider: string, apiKey: string)=> void,
+    error: string, 
+    isProcessing: boolean, 
+    answer: string,
+    setProvider: Dispatch<SetStateAction<string>>
+    provider: string,
+    setApiKey: Dispatch<SetStateAction<string>>,
+    apiKey: string
 }
 
-export default function CredentialsForm({ providers }: Props){
-    const [provider, setProvider] = useState(providers[0].id);
-    const [apiKey, setApiKey] = useState('');
-    const { verifyCredentials, error, isProcessing, answer }= useVerifyCredential()
-    
+export default function CredentialsForm({ providers, getWebSummary, error, isProcessing, answer, setApiKey, setProvider, apiKey, provider }: Props){ 
     const handleClick = () => {
-        verifyCredentials(provider, apiKey)
+        getWebSummary(provider, apiKey)
     }
     return (
         <form className="grid grid-cols-1 md:grid-cols-1 gap-4">
@@ -77,6 +80,7 @@ export default function CredentialsForm({ providers }: Props){
               </motion.div>
             )}
           </AnimatePresence>
+          {answer}
         </form>
     )
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { availableProviders } from "@/app/api/data/providers";
-import { askModelUsingProviderCredentials } from "@/app/api/services/textProvider";
-export async function POST(req: Request){
+import { getWebSummary } from "@/app/api/services/textProvider";
+export async function POST(req: Request) {
     const { provider, apiKey } = await req.json();
     if (!provider || !apiKey) {
         return NextResponse.json({ error: "Missing provider or apiKey" }, { status: 422 });
@@ -11,11 +11,11 @@ export async function POST(req: Request){
         return NextResponse.json({ error: "Invalid provider" }, { status: 400 });
     }
     try {
-        const answer = await askModelUsingProviderCredentials({ modelName: providerData.model, createProvider: providerData.createProvider}, apiKey);
+        const answer = await getWebSummary({ modelName: providerData.model, createProvider: providerData.createProvider }, apiKey);
         return NextResponse.json({ answer });
-    }catch(err){
+    } catch (err) {
         const error = err as Error;
         return NextResponse.json({ error: error.message }, { status: 400 });
     }
-    
+
 }

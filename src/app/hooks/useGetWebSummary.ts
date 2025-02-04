@@ -1,12 +1,12 @@
 import { useState } from "react";
 
-export default function useVerifyCredential(){
+export default function useGetWebSummary(){
     const [error, setError] = useState('');
     const [isProcessing, setIsProcessing ] = useState(false);
     const [ answer, setAnswer ] = useState('')
-    async function verifyCredentials(provider: string, apiKey: string){
+    async function getWebSummary(provider: string, apiKey: string){
         setIsProcessing(true);
-        const res = await fetch(`http://localhost:3000/api/verifyProviderCredentials`, {
+        const res = await fetch(`http://localhost:3000/api/getWebSummary`, {
             method: 'POST',
             body: JSON.stringify({ provider, apiKey }),
         });
@@ -19,5 +19,5 @@ export default function useVerifyCredential(){
         setAnswer(json.answer);
     }
 
-    return { verifyCredentials, error, isProcessing, answer};
+    return { getWebSummary, error, isProcessing, answer};
 }
