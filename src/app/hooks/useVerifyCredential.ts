@@ -11,11 +11,11 @@ export default function useVerifyCredential(){
             body: JSON.stringify({ provider, apiKey }),
         });
         const json = await res.json();
+        setIsProcessing(false);
         if(!res.ok){
-            setError(json.error);
+            return setError(json.error);
         }
         setError('')
-        setIsProcessing(false);
         setAnswer(json.answer);
     }
 

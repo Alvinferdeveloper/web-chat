@@ -4,10 +4,9 @@ import { askModelUsingProviderCredentials } from "@/app/api/services/textProvide
 export async function POST(req: Request){
     const { provider, apiKey } = await req.json();
     if (!provider || !apiKey) {
-        return NextResponse.json({ error: "Missing provider or apiKey" }, { status: 400 });
+        return NextResponse.json({ error: "Missing provider or apiKey" }, { status: 422 });
     }
     const providerData = availableProviders.find((p) => p.id === provider);
-   console.log(availableProviders, provider)
     if (!providerData) {
         return NextResponse.json({ error: "Invalid provider" }, { status: 400 });
     }
@@ -16,7 +15,7 @@ export async function POST(req: Request){
         return NextResponse.json({ answer });
     }catch(err){
         const error = err as Error;
-        return NextResponse.json({ error: error.message }, { status: 401 });
+        return NextResponse.json({ error: error.message }, { status: 400 });
     }
     
 }

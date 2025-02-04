@@ -20,7 +20,7 @@ export async function askModelUsingProviderCredentials({ createProvider, modelNa
             throw new Error("Invalid api key");
         }
         else {
-            throw new Error("Ocurred and error");
+            throw new Error("An error occurred: verify that you have enough tokens or wait for the service to be restored");
         }
     }
 }
