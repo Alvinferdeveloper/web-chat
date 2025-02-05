@@ -1,11 +1,11 @@
 "use client"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { useChat } from 'ai/react'
 import { Card, CardContent } from "@/components/ui/card";
 import { Send, User, Bot } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {  useEffect } from "react";
 
 interface Props {
     context: string,
@@ -22,9 +22,13 @@ export default function ChatArea({ context, provider, apiKey }: Props) {
             apiKey,
         },
     });
+
+    useEffect(() => {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+      }, [messages]); 
     return (
             <div className="flex-1 flex flex-col">
-                <ScrollArea className="flex-1 p-4">
+                <div className="flex-1 p-4">
                     {messages.map((m) => (
                         <Card key={m.id} className="mb-4 max-w-[80%] mx-auto bg-gray-700 border-gray-600">
                             <CardContent className="p-4">
@@ -42,7 +46,7 @@ export default function ChatArea({ context, provider, apiKey }: Props) {
                             </CardContent>
                         </Card>
                     ))}
-                </ScrollArea>
+                </div>
 
                 {/* Input area */}
                 <form onSubmit={handleSubmit} className="fixed bottom-4 flex justify-center w-full left-0">
