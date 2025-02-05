@@ -14,24 +14,24 @@ type provider = {
 interface Props {
     providers: provider[]
 }
-export default function LlmProcessing({ providers }: Props) { 
-    const { getWebSummary, error, isProcessing, answer }=  useGetWebSummary();
+export default function LlmProcessing({ providers }: Props) {
+    const { getWebSummary, error, isProcessing, answer } = useGetWebSummary();
     const [provider, setProvider] = useState(providers[0].id);
     const [apiKey, setApiKey] = useState('');
     return (
-        <>
-        <CredentialsForm 
-        providers={providers} 
-        getWebSummary={getWebSummary} 
-        error={error} 
-        isProcessing={isProcessing} 
-        answer={answer}
-        provider={provider}
-        setProvider={setProvider}
-        apiKey ={ apiKey }
-        setApiKey={setApiKey}
-        />
-        <ChatArea context={answer} provider={provider} apiKey={apiKey}/>
-        </>
+        <div className=" relative">
+            <CredentialsForm
+                providers={providers}
+                getWebSummary={getWebSummary}
+                error={error}
+                isProcessing={isProcessing}
+                answer={answer}
+                provider={provider}
+                setProvider={setProvider}
+                apiKey={apiKey}
+                setApiKey={setApiKey}
+            />
+            <ChatArea context={answer} provider={provider} apiKey={apiKey} />
+        </div>
     )
 }
