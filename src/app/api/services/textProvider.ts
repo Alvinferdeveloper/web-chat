@@ -25,18 +25,16 @@ export async function getWebSummary({ createProvider, modelName = '' }: Provider
 }
 
 export async function askModelUsingProviderCredentials({ createProvider, modelName = '' }: Provider, apiKey: string, messages: any, context: string){
-    console.log(apiKey, "apiKey: ");
     const model = createProvider({ apiKey: apiKey })
     try {
         const result = streamText({
             model: model(modelName),
-            system: `Quiero que respondas basado en esta informacion que te doy ${context}`,
+            system: `Quiero que respondas basado en esta informacion que te doy ${context} por favor debuelveme la respuesta en markdown muy bien estructurado y entendible para el usuario y asi mostrarlo en la interfaz`,
             messages
         });
         return result;
     }
     catch (err) {
-        console.log("error: ", err);
         const error = err as { statusCode:number};
         if (error.statusCode === 401) {
             throw new Error("Invalid api key");

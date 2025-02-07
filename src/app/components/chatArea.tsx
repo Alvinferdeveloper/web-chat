@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {  useEffect } from "react";
+import ReactMarkdown from 'react-markdown'
 
 interface Props {
     context: string,
@@ -40,7 +41,7 @@ export default function ChatArea({ context, provider, apiKey }: Props) {
                                     </Avatar>
                                     <div className="space-y-2">
                                         <p className="text-sm font-medium text-gray-200">{m.role === "user" ? "Tú" : "AI"}</p>
-                                        <p className="text-sm text-gray-300">{m.content}</p>
+                                        <ReactMarkdown className="prose text-md text-gray-300 tracking-wide leading-loose">{m.content}</ReactMarkdown>;
                                     </div>
                                 </div>
                             </CardContent>
