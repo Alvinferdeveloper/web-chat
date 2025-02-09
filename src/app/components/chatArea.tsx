@@ -41,7 +41,7 @@ export default function ChatArea({ context, provider, apiKey }: Props) {
                                     </Avatar>
                                     <div className="space-y-2">
                                         <p className="text-sm font-medium text-gray-200">{m.role === "user" ? "Tú" : "AI"}</p>
-                                        <ReactMarkdown className="prose text-md text-gray-300 tracking-wide leading-loose">{m.content}</ReactMarkdown>;
+                                        <ReactMarkdown className="prose text-md text-gray-300 tracking-wide leading-loose">{m.content}</ReactMarkdown>
                                     </div>
                                 </div>
                             </CardContent>

@@ -9,7 +9,6 @@ export const maxDuration = 30;
 
 export async function POST(req: Request) {
    const { provider, apiKey, messages, context } = await req.json();
-   console.log(messages, "messages");
        if (!provider || !apiKey) {
            return NextResponse.json({ error: "Missing provider or apiKey" }, { status: 422 });
        }
