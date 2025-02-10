@@ -1,14 +1,16 @@
 import { generateText , streamText, } from "ai"
+import { scrappWeb } from "./scrapper";
 interface Provider {
     createProvider: providerCreators,
     modelName?: string
 }
-export async function getWebSummary({ createProvider, modelName = '' }: Provider, apiKey: string){
-    const model = createProvider({ apiKey: apiKey })
+export async function getWebSummary({ createProvider, modelName = '' }: Provider, apiKey: string, url: string){
+    const model = createProvider({ apiKey: apiKey });
+    const webInfo = await scrappWeb(url);
     try {
         const { text } = await generateText({
             model: model(modelName),
-            prompt:"Quiero que me des un resumen sobre aws"
+            prompt:`I want you to help me by giving me a brief summary of this information: ${webInfo}, this is information from a website,  respond in the same language of the website information, give me a summary of the most relevant data, I want it to be clear and concise. You can talk about the author, date and other relevant information. Always start with the phrase this website is about...`
         });
         return text;
     }

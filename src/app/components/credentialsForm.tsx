@@ -18,19 +18,21 @@ type provider = {
 
 interface Props {
   providers: provider[],
-  getWebSummary: (provider: string, apiKey: string) => void,
+  getWebSummary: (provider: string, apiKey: string, url: string) => void,
   error: string,
   isProcessing: boolean,
   answer: string,
   setProvider: Dispatch<SetStateAction<string>>
   provider: string,
   setApiKey: Dispatch<SetStateAction<string>>,
-  apiKey: string
+  apiKey: string,
+  url: string,
+  setUrl: Dispatch<SetStateAction<string>>
 }
 
-export default function CredentialsForm({ providers, getWebSummary, error, isProcessing, answer, setApiKey, setProvider, apiKey, provider }: Props) {
+export default function CredentialsForm({ providers, getWebSummary, error, isProcessing, answer, setApiKey, setProvider, apiKey, provider, url, setUrl }: Props) {
   const handleClick = () => {
-    getWebSummary(provider, apiKey)
+    getWebSummary(provider, apiKey, url)
   }
   return (
     <form className="grid grid-cols-1 md:grid-cols-1 gap-4 bg-white rounded-md">
@@ -67,7 +69,7 @@ export default function CredentialsForm({ providers, getWebSummary, error, isPro
               onChange={(e) => setApiKey(e.target.value)}
             />
             <div className="flex space-x-2">
-              <Input placeholder="Ingresa una URL" name="url" />
+              <Input placeholder="Ingresa una URL" name="url" value={url} onChange={(e)=>setUrl(e.target.value)} />
               <Button onClick={handleClick} type="button">
                 {isProcessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Zap className="w-4 h-4 mr-2" />}
                 {isProcessing ? "Procesando..." : "Procesar URL"}
