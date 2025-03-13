@@ -36,7 +36,7 @@ export default function CredentialsForm({ providers, getWebSummary, error, isPro
   }
   return (
     <form className="grid grid-cols-1 md:grid-cols-1 gap-4 bg-white rounded-md">
-      <Accordion type="single" collapsible className="border-b border-gray-700">
+      <Accordion type="single" collapsible className="border-b border-gray-700" defaultValue="model-settings">
         <AccordionItem value="model-settings" className="border-none">
           <AccordionTrigger className="px-4 py-3 text-xl font-semibold w-full text-black hover:text-slate-700 flex justify-between items-center">
             <span>Credenciales</span>
