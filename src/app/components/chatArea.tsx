@@ -10,17 +10,12 @@ import ReactMarkdown from 'react-markdown'
 
 interface Props {
     context: string,
-    provider: string,
-    apiKey: string,
-
 }
 
-export default function ChatArea({ context, provider, apiKey }: Props) {
+export default function ChatArea({ context }: Props) {
     const { messages, input, handleInputChange, handleSubmit } = useChat({
         body: {
             context,
-            provider,
-            apiKey,
         },
     });
 
