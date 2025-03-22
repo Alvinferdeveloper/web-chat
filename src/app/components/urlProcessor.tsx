@@ -1,10 +1,10 @@
 "use client"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Zap, ChevronDown, ChevronUp} from "lucide-react"
+import { Zap, ChevronDown, ChevronUp } from "lucide-react"
 import { useState } from "react"
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { AnimatePresence, motion} from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 
 interface Props {
@@ -18,12 +18,12 @@ export default function UrlProcessor({ getWebSummary, answer, error, isProcessin
   const handleClick = () => {
     getWebSummary(url);
   }
-  
+
   const [isOpen, setIsOpen] = useState(true)
   const [url, setUrl] = useState("")
 
   return (
-    <div className="flex justify-cente">
+    <div className="flex sticky top-0">
       <Card className="w-full max-w-5xl bg-[#111827]/80 border-[#2d3748] backdrop-blur-sm">
         <CardHeader className="border-b border-[#2d3748] pb-3">
           <div className="flex justify-between items-center cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
