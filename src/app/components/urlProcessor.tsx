@@ -23,7 +23,7 @@ export default function UrlProcessor({ getWebSummary, answer, error, isProcessin
   const [url, setUrl] = useState("")
 
   return (
-    <div className="flex sticky top-0">
+    <div className="flex sticky top-0 z-20">
       <Card className="w-full max-w-5xl bg-[#111827]/80 border-[#2d3748] backdrop-blur-sm">
         <CardHeader className="border-b border-[#2d3748] pb-3">
           <div className="flex justify-between items-center cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
