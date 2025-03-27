@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto'
 import supabase from '@/lib/supabase';
+import { PlanService } from './plan.service';
 
 interface AuthUser {
   id: string;
@@ -13,6 +14,10 @@ interface AuthAccount {
   provider_id: string;
 }
 
+interface UserId {
+  id: string;
+}
+
 export class AuthService {
   static async findUser(providerId: string, provider: string) {
     const { data: existingUser } = await supabase
@@ -21,21 +26,21 @@ export class AuthService {
       .eq('provider_id', providerId)
       .eq('provider', provider.toUpperCase())
       .single();
-    
+
     return existingUser;
   }
 
   static async createUser(user: AuthUser, account: AuthAccount) {
-    const { error } = await supabase.from('user').insert([
+    const { data } = await supabase.from('user').insert([
       {
         ...user,
         id: randomUUID(),
         provider: account.provider.toUpperCase(),
         provider_id: account.provider_id
       }
-    ]);
+    ]).select<'id', UserId>('id').single();
 
-    return !error;
+    return data?.id || null;
   }
 
   static async handleSignIn(user: AuthUser, account: AuthAccount) {
@@ -43,7 +48,9 @@ export class AuthService {
       const existingUser = await this.findUser(account.provider_id, account.provider);
 
       if (!existingUser) {
-        return await this.createUser(user, account);
+        const newUserId = await this.createUser(user, account);
+        newUserId && await PlanService.assignFreePlan(newUserId);
+        return !!newUserId;
       }
 
       return true;
