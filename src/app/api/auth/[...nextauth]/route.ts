@@ -1,8 +1,7 @@
 import NextAuth, { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from 'next-auth/providers/github';
-import supabase from "@/lib/supabase";
-import { randomUUID } from "node:crypto";
+import { AuthService } from "../../services/auth.service";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -18,26 +17,18 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === 'google' || account?.provider === 'github') {
-        const { data: existingUser } = await supabase
-          .from('user')
-          .select()
-          .eq('provider_id', user.id)
-          .eq('provider', account.provider.toUpperCase())
-          .single();
-
-        if (!existingUser) {
-          const { error } = await supabase.from('user').insert([
-            {
-              ...user,
-              id: randomUUID(),
-              provider: account.provider.toUpperCase(),
-              provider_id: user.id
-            }
-          ]);
-          return !error;
-        }
-
-        return true;
+        return await AuthService.handleSignIn(
+          {
+            id: user.id,
+            email: user.email!,
+            name: user.name!,
+            image: user.image!
+          },
+          {
+            provider: account.provider,
+            provider_id: user.id
+          }
+        );
       }
       return false;
     }
