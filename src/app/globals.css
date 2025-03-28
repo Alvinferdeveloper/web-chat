@@ -70,3 +70,12 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.bg-dark {
+  @apply bg-gradient-to-br from-slate-950 to-slate-800;
+}
+
+.bg-darkBlue {
+  @apply bg-[#111530]
+}
+
