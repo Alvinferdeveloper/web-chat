@@ -1,15 +1,20 @@
 "use client"
-import { LogOut } from "lucide-react"
+import { LogOut, CircleDollarSign } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface DropdownMenuProps {
   trigger: React.ReactNode
 }
 
 export default function CustomDropdownMenu({ trigger }: DropdownMenuProps) {
+  const router = useRouter();
   const handleLogout = async () => {
     await signOut();
+  }
+  const handlePricing = ()=>{
+    router.push('/plans')
   }
 
   return (
@@ -26,6 +31,13 @@ export default function CustomDropdownMenu({ trigger }: DropdownMenuProps) {
             >
               <LogOut className="mr-3 h-4 w-4" />
               <span>Log out</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={handlePricing}
+              className="flex cursor-pointer items-center py-3  data-[highlighted]:hover:bg-gray-800 data-[highlighted]:hover:text-white"
+            >
+              <CircleDollarSign className="mr-3 h-4 w-4" />
+              <span>Pricing</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
