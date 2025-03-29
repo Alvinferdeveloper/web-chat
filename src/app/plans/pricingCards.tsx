@@ -1,9 +1,11 @@
 import { Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import supabase from "@/lib/supabase";
+import { getMostPopularPlanId, getPlans } from "../actions/plan";
+import { Badge } from '@/components/ui/badge'
 
 interface Plan {
+    id: string,
     name: string;
     price: number;
     features: string[];
@@ -11,14 +13,15 @@ interface Plan {
 }
 
 export default async function PricingCards() {
-    const { data: plans } = await supabase.from('plan').select('*');
+    const { data: plans } = await getPlans();
+    const mostPopularPlanId = await getMostPopularPlanId();
     return (
         <div className="flex justify-center h-[70%]">
             <div className="grid md:grid-cols-3 gap-6">
                 {plans?.map((plan: Plan) => (
                     <Card
                         key={plan.name}
-                        className={`flex flex-col bg-[#111530] border-[#2a2f45]`}
+                        className={`flex flex-col bg-[#111530] border-[#2a2f45] ${plan.id === mostPopularPlanId ? "border-blue-500 shadow-lg shadow-blue-500/10" : ""}`}
                     >
                         <CardHeader>
                             <div className="flex justify-between items-start">
@@ -26,6 +29,7 @@ export default async function PricingCards() {
                                     <CardTitle className="text-white">{plan.name}</CardTitle>
                                     <CardDescription className="mt-1 text-gray-400">{plan.description}</CardDescription>
                                 </div>
+                                {plan.id === mostPopularPlanId && <Badge className="bg-blue-500 text-white hover:bg-blue-600">Popular</Badge>}
                             </div>
                         </CardHeader>
                         <CardContent className="flex-1">
@@ -46,7 +50,12 @@ export default async function PricingCards() {
                         <CardFooter>
                             <Button
                                 className="w-full bg-transparent text-white"
-                                variant={"outline"}
+                                variant={mostPopularPlanId === plan.id ? "default" : "outline"}
+                                style={{
+                                    backgroundColor: mostPopularPlanId === plan.id ? "#3b82f6" : "transparent",
+                                    borderColor: mostPopularPlanId === plan.id ? "#3b82f6" : "#2a2f45",
+                                    color: mostPopularPlanId === plan.id ? "white" : "#e2e8f0",
+                                }}
                             >
                                 {`Get ${plan.name}`}
                             </Button>
