@@ -7,7 +7,6 @@ import CustomDropdownMenu from "./customDropDownMenu";
 
 export default function Header() {
     const { data: session } = useSession();
-    console.log(session?.user?.image)
     return (
         <header className="w-full h-10 left-0 fixed flex justify-between px-7 y- items-center">
             <p className={`${orbitron.className} text-2xl text-white`}>Mi logo </p>

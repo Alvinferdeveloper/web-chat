@@ -45,7 +45,7 @@ export default async function PricingCards() {
                         </CardContent>
                         <CardFooter>
                             <Button
-                                className="w-full"
+                                className="w-full bg-transparent text-white"
                                 variant={"outline"}
                             >
                                 {`Get ${plan.name}`}
