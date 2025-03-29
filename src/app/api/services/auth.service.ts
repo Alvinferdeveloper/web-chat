@@ -50,12 +50,11 @@ export class AuthService {
       if (!existingUser) {
         const newUserId = await this.createUser(user, account);
         newUserId && await PlanService.assignFreePlan(newUserId);
-        return !!newUserId;
+        return newUserId;
       }
-
-      return true;
+      return existingUser.id;
     } catch (error) {
-      return false;
+      return null;
     }
   }
 } 

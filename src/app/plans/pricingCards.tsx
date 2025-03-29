@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { getMostPopularPlanId, getPlans } from "../actions/plan";
 import { Badge } from '@/components/ui/badge'
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 
 interface Plan {
     id: string,
@@ -15,6 +17,7 @@ interface Plan {
 export default async function PricingCards() {
     const { data: plans } = await getPlans();
     const mostPopularPlanId = await getMostPopularPlanId();
+    const session = await getServerSession(authOptions);
     return (
         <div className="flex justify-center h-[70%]">
             <div className="grid md:grid-cols-3 gap-6">

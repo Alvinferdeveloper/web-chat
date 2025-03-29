@@ -12,7 +12,7 @@ export class PlanService {
             if (!freePlan) {
                 return false;
             }
-            
+
             const startDate = new Date();
             const endDate = new Date();
             endDate.setDate(endDate.getDate() + 31);
@@ -30,5 +30,30 @@ export class PlanService {
         } catch (error) {
             return false;
         }
+    }
+    static async getUserPlan(planId: number | null, userId: string | undefined) {
+        let plan;
+        if (!planId) {
+            plan = await supabase
+                .from("plan")
+                .select('id')
+                .eq("name", 'FREE')
+                .single();
+        }
+        else {
+            plan = await supabase
+                .from("plan")
+                .select('id')
+                .eq("id", planId)
+                .single();
+        }
+        const { data, error } = await supabase
+            .from("suscription")
+            .select("plan_id")
+            .eq('plan_id', plan.data?.id)
+            .eq('user_id', userId)
+            .eq("status", "ACTIVE")
+            .single();
+        return error ? null : data?.plan_id;
     }
 }
