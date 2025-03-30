@@ -8,7 +8,7 @@ export async function getWebSummary(url: string) {
     try {
         const { text } = await generateText({
             model: model('gemini-1.5-flash'),
-            prompt: `I want you to help me by giving me a brief summary of this information: ${webInfo}, this is information from a website,  respond in the same language of the website information, give me a summary of the most relevant data, I want it to be clear and concise. You can talk about the author, date and other relevant information. Always start with the phrase this website is about...`
+            prompt: `I would like your help with a brief summary of the following information in HTML format: ${webInfo}. This information comes from a website. Please respond in the same language as the website's information is the information is in spanish, use spanish if in english, use english and so on. Describe the most relevant information clearly and concisely. You may mention the author, the date, and other relevant information. Always begin with the phrase "what this website is about."`
         });
         return text;
     }
