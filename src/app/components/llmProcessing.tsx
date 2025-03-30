@@ -4,16 +4,16 @@ import ChatArea from "./chatArea"
 import useGetWebSummary from "../hooks/useGetWebSummary"
 
 export default function LlmProcessing() {
-    const { getWebSummary, error, isProcessing, answer } = useGetWebSummary();
+    const { getWebSummary, error, isProcessing, summary, context } = useGetWebSummary();
     return (
         <div className="relative">
             <UrlProcessor
                 getWebSummary={getWebSummary}
                 error={error}
                 isProcessing={isProcessing}
-                answer={answer}
+                summary={summary}
             />
-            <ChatArea context={answer} />
+            <ChatArea context={context} />
         </div>
     )
 }

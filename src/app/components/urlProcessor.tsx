@@ -11,10 +11,10 @@ interface Props {
   getWebSummary: (url: string) => void,
   error: string,
   isProcessing: boolean,
-  answer: string,
+  summary: string,
 }
 
-export default function UrlProcessor({ getWebSummary, answer, error, isProcessing }: Props) {
+export default function UrlProcessor({ getWebSummary, summary, error, isProcessing }: Props) {
   const handleClick = () => {
     getWebSummary(url);
   }
@@ -68,7 +68,7 @@ export default function UrlProcessor({ getWebSummary, answer, error, isProcessin
               <h3 className="font-medium mb-2">Resumen de la web</h3>
               <p className="text-sm text-white/80">
                 {
-                  answer ? answer : 'El contenido del resumen aparecerá aquí después de procesar la URL.'
+                  summary ? summary : 'El contenido del resumen aparecerá aquí después de procesar la URL.'
                 }
               </p>
             </div>

@@ -10,7 +10,8 @@ export async function scrappWeb(url: string){
   
       const page = await browser.newPage();
       await page.goto(url, { waitUntil: 'domcontentloaded'});
-      const body = await page.evaluate(() => document.body.outerHTML);
+      const body = await page.evaluate(() => document.body.innerText);
+      const information = `La url de la web es:${url}\n` + body;
       await browser.close();
-      return body;
+      return information;
 }
