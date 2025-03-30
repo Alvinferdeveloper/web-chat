@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function useGetWebSummary(){
+export default function useGetWebContext(){
     const [error, setError] = useState('');
     const [isProcessing, setIsProcessing ] = useState(false);
     const [ summary, setSummary ] = useState('');
