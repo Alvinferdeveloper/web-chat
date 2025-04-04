@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getWebSummary } from "@/app/api/services/textProvider";
-import { scrappWeb } from "../services/scrapper";
+import { getWebSummary } from "@/app/api/services/textProvider.service";
+import { scrappWeb } from "../services/scrapper.service";
 
 export async function POST(req: Request) {
     const { url } = await req.json();

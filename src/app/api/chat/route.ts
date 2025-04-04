@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { askModel } from '@/app/api/services/textProvider';
+import { askModel } from '@/app/api/services/textProvider.service';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
