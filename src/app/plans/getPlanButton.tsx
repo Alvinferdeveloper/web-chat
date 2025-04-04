@@ -1,3 +1,4 @@
+"use client"
 import { Button } from "@/components/ui/button"
 
 interface Props {
@@ -7,6 +8,17 @@ interface Props {
     planName: string
 }
 export default function GetPlanButton({ mostPopularPlanId, planId, userPlanId, planName }: Props) {
+    const handleClick = () => {
+        fetch('/api/checkout',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ planId })
+            }
+        ).then(res => res.json()).then(data => window.location.href = data.stripeUrl)
+    }
     return (
         <Button
             className="w-full bg-transparent text-white hover:opacity-70"
@@ -17,6 +29,7 @@ export default function GetPlanButton({ mostPopularPlanId, planId, userPlanId, p
                 color: mostPopularPlanId === planId ? "white" : "#e2e8f0",
             }}
             disabled={planId === userPlanId}
+            onClick={handleClick}
         >
             {planId === userPlanId ? "Your current plan" : `Get ${planName}`}
         </Button>
