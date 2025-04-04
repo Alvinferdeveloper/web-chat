@@ -5,6 +5,7 @@ import { getMostPopularPlanId, getPlans } from "../actions/plan";
 import { Badge } from '@/components/ui/badge'
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
+import GetPlanButton from "./getPlanButton";
 
 interface Plan {
     id: string,
@@ -52,18 +53,12 @@ export default async function PricingCards() {
                         </CardContent>
                         <CardFooter>
                             <div className={` w-full ${plan.id === session?.user.plan && "cursor-not-allowed"}`}>
-                                <Button
-                                    className="w-full bg-transparent text-white hover:opacity-70"
-                                    variant={mostPopularPlanId === plan.id ? "default" : "outline"}
-                                    style={{
-                                        backgroundColor: mostPopularPlanId === plan.id ? "#3b82f6" : "transparent",
-                                        borderColor: mostPopularPlanId === plan.id ? "#3b82f6" : "#2a2f45",
-                                        color: mostPopularPlanId === plan.id ? "white" : "#e2e8f0",
-                                    }}
-                                    disabled={plan.id === session?.user.plan}
-                                >
-                                    {plan.id === session?.user.plan ? "Your current plan" : `Get ${plan.name}`}
-                                </Button>
+                                <GetPlanButton
+                                    mostPopularPlanId={mostPopularPlanId}
+                                    planId={Number(plan.id)}
+                                    userPlanId={session?.user.plan ? Number(session?.user.plan) : undefined}
+                                    planName={plan.name}
+                                />
                             </div>
                         </CardFooter>
                     </Card>
