@@ -1,12 +1,10 @@
 "use client"
 import { useChat } from 'ai/react'
-import { Card, CardContent } from "@/components/ui/card";
-import { Send, Bot } from "lucide-react";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
-import ReactMarkdown from 'react-markdown'
+import MessageCard from './messageCard';
 import { useSession } from 'next-auth/react';
 
 
@@ -29,21 +27,7 @@ export default function ChatArea({ context }: Props) {
         <div className="flex-1 flex flex-col">
             <div className="flex-1 p-4">
                 {messages.map((m) => (
-                    <Card key={m.id} className="mb-4 max-w-[80%] mx-auto bg-gray-700 border-gray-600">
-                        <CardContent className="p-4">
-                            <div className="flex items-start space-x-4">
-                                <Avatar>
-                                    {
-                                        m.role === 'user' && session?.user?.image ? <AvatarImage src={session?.user?.image} /> : <Bot className="text-gray-200" />
-                                    }
-                                </Avatar>
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium text-gray-200">{m.role === "user" ? "Tú" : "AI"}</p>
-                                    <ReactMarkdown className="prose text-md text-gray-300 tracking-wide leading-loose">{m.content}</ReactMarkdown>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <MessageCard key={m.id} role={m.role} content={m.content} userImage={session?.user.image || undefined} />
                 ))}
             </div>
 

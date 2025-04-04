@@ -1,7 +1,7 @@
 "use client"
 import UrlProcessor from "./urlProcessor";
 import ChatArea from "./chatArea"
-import useGetWebContext from "../hooks/useGetWebContext"
+import useGetWebContext from "../../hooks/useGetWebContext"
 
 export default function LlmProcessing() {
     const { getWebSummary, error, isProcessing, summary, context } = useGetWebContext();

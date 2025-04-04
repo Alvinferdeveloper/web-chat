@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card"
-import LlmProcessing from "@/app/components/llmProcessing"
-import Header from "./components/header"
+import LlmProcessing from "@/app/components/chat/llmProcessing"
+import Header from "./components/layout/header"
 
 export default async function Home() {
   return (

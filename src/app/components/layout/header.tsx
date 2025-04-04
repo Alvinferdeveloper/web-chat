@@ -2,8 +2,8 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { useSession } from "next-auth/react";
 import { User2 } from "lucide-react";
-import { orbitron } from "../font";
-import CustomDropdownMenu from "./customDropDownMenu";
+import { orbitron } from "../../font";
+import CustomDropdownMenu from "../customDropDownMenu";
 
 export default function Header() {
     const { data: session } = useSession();
