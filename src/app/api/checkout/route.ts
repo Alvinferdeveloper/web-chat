@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Plan not found" }, { status: 404 });
     }
     const session = await stripe.checkout.sessions.create({
-        success_url: 'http://localhost:3000/plans',
+        success_url: `${process.env.NEXT_PUBLIC_APP_URL}/plans`,
         line_items: [
             {
                 price_data: {
