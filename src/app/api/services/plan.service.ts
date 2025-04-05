@@ -56,4 +56,9 @@ export class PlanService {
             .single();
         return error ? null : data?.plan_id;
     }
+
+    static async getPlanById(planId: number) {
+        const { data, error } = await supabase.from('plan').select('id, name, price').eq('id', planId).single();
+        return error ? null : data;
+    }
 }

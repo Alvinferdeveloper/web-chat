@@ -1,8 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { PlanService } from '../services/plan.service';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-export async function POST() {
+export async function POST(req: NextRequest) {
+    const { planId } = await req.json();
+    const plan = await PlanService.getPlanById(planId);
+    if(!plan){
+        return NextResponse.json({ error: "Plan not found" }, { status: 404 });
+    }
     const session = await stripe.checkout.sessions.create({
         success_url: 'http://localhost:3000/plans',
         line_items: [
@@ -10,7 +16,7 @@ export async function POST() {
                 price_data: {
                     currency: 'usd',
                     product_data: {
-                        name: 'Web chat Plus subscription',
+                        name: `Web chat ${plan.name} subscription`,
                         description: 'Monthly subscription\nSubtotal: $20.00\nTotal due today: $20.00',
 
                     },
@@ -18,7 +24,7 @@ export async function POST() {
                         interval: 'month',
                         interval_count: 1,
                     },
-                    unit_amount: 2000,
+                    unit_amount: plan.price * 100, // in cents
                 },
                 quantity: 1,
             },
