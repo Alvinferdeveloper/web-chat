@@ -13,6 +13,7 @@ interface Plan {
     price: number;
     features: string[];
     description: string;
+    interval: string;
 }
 
 export default async function PricingCards() {
@@ -56,7 +57,7 @@ export default async function PricingCards() {
                             <CardContent className="flex-1">
                                 <div className="font-bold text-3xl text-white">
                                     ${plan.price}
-                                    <span className="text-sm font-normal text-gray-400">/mes</span>
+                                    <span className="text-sm font-normal text-gray-400">/{plan.interval}</span>
                                 </div>
 
                                 <ul className="mt-6 space-y-3">
