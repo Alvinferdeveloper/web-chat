@@ -10,15 +10,22 @@ export async function POST() {
                 price_data: {
                     currency: 'usd',
                     product_data: {
-                        name: 'T-shirt',
+                        name: 'Web chat Plus subscription',
+                        description: 'Monthly subscription\nSubtotal: $20.00\nTotal due today: $20.00',
+
+                    },
+                    recurring: {
+                        interval: 'month',
+                        interval_count: 1,
                     },
                     unit_amount: 2000,
                 },
                 quantity: 1,
             },
-        ],
-        mode: 'payment',
-    });
 
+        ],
+        mode: 'subscription',
+    });
+   
     return NextResponse.json({ stripeUrl: session.url });
 }
