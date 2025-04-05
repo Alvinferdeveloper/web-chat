@@ -17,11 +17,11 @@ export async function POST(req: NextRequest) {
                     currency: 'usd',
                     product_data: {
                         name: `Web chat ${plan.name} subscription`,
-                        description: 'Monthly subscription\nSubtotal: $20.00\nTotal due today: $20.00',
+                        description: `${plan.interval == 'month' ? 'Monthly' : 'Yearly'} subscription\nSubtotal: $20.00\nTotal due today: $20.00`,
 
                     },
                     recurring: {
-                        interval: 'month',
+                        interval: plan.interval,
                         interval_count: 1,
                     },
                     unit_amount: plan.price * 100, // in cents
