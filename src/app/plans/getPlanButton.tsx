@@ -34,7 +34,7 @@ export default function GetPlanButton({ mostPopularPlanId, planId, userPlanId, p
                     "text-white"
                 ] : [
                     "bg-transparent hover:bg-gray-800",
-                    "border-[#2a2f45] hover:border-gray-700",
+                    "border-[#2a2f45] border-2 hover:border-gray-700",
                     "text-gray-200"
                 ],
                 isCurrentPlan && "opacity-50 cursor-not-allowed"

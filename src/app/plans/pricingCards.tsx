@@ -31,7 +31,7 @@ export default async function PricingCards() {
                         <Card
                             key={plan.name}
                             className={cn(
-                                "flex flex-col bg-[#111530] border-[#2a2f45]",
+                                "flex flex-col bg-darkBlue border-[#2a2f45]",
                                 "transition-all duration-200",
                                 isPopular && "border-blue-500 shadow-lg shadow-blue-500/10"
                             )}
