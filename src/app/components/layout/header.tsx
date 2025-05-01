@@ -5,12 +5,15 @@ import { User2 } from "lucide-react";
 import { orbitron } from "../../font";
 import CustomDropdownMenu from "../customDropDownMenu";
 import ProfileDropDownMenu from "../chat/profileDropDownMenu";
+import PlansDropDownMenu from "../chat/plansDropDownMenu";
 
 export default function Header() {
     const { data: session } = useSession();
     return (
-        <header className="w-full h-10 left-0 fixed flex justify-between px-7 y- items-center">
-            <p className={`${orbitron.className} text-2xl text-white`}>Mi logo </p>
+        <header className="w-full h-10 left-0 fixed flex justify-between px-7 items-center">
+            <CustomDropdownMenu trigger={<div className={`${orbitron.className} text-2xl text-white cursor-pointer hover:opacity-80`}>Mi logo </div>}>
+                <PlansDropDownMenu />
+            </CustomDropdownMenu>
             <CustomDropdownMenu trigger={
                 <Avatar className="cursor-pointer hover:opacity-80">
                     {session?.user?.image && <AvatarImage src={session?.user?.image} />}

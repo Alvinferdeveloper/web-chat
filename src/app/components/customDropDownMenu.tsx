@@ -8,16 +8,12 @@ interface DropdownMenuProps {
 
 export default function CustomDropdownMenu({ trigger, children }: DropdownMenuProps) {
   return (
-    <div className="w-full max-w-md p-6">
-      <div className="flex justify-end">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            {trigger}
-          </DropdownMenuTrigger>
-          {children}
-        </DropdownMenu>
-      </div>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        {trigger}
+      </DropdownMenuTrigger>
+      {children}
+    </DropdownMenu>
   )
 }
 
