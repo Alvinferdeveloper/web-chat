@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { PlanService } from '../services/plan.service';
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 export async function POST(req: NextRequest) {
     const { planId } = await req.json();
+    const userSession = await getServerSession(authOptions);
+    if (!userSession?.user.id) {
+        return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+    }
     const plan = await PlanService.getPlanById(planId);
-    if(!plan){
+    if (!plan) {
         return NextResponse.json({ error: "Plan not found" }, { status: 404 });
     }
     const session = await stripe.checkout.sessions.create({
@@ -30,8 +36,12 @@ export async function POST(req: NextRequest) {
             },
 
         ],
+        metadata: {
+            planId: plan.id,
+            userId: userSession.user.id
+        },
         mode: 'subscription',
     });
-   
+
     return NextResponse.json({ stripeUrl: session.url });
 }
