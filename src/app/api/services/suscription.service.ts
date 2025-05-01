@@ -55,4 +55,22 @@ export class SuscriptionService {
             .single();
         return error ? null : data?.plan_id;
     }
+
+    static async addSuscription(planId: number, userId: string) {
+        const startDate = new Date();
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + 31);
+        const { data, error } = await supabase
+            .from("suscription")
+            .insert({
+                user_id: userId,
+                plan_id: planId,
+                start_date: startDate,
+                end_date: endDate,
+                status: 'ACTIVE'
+            });
+        if(error){
+            throw new Error(error.message);
+        }
+    }
 }
