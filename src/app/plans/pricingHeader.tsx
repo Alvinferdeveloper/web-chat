@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 export default function PricingHeader() {
     const router = useRouter()
     const handleCloseWindow = () => {
-        router.back();
+        router.push('/');
     }
     return (
         <div className="text-center mt h-[20%] mb-4 flex justify-center flex-col">
