@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 interface Props {
-    mostPopularPlanId: number,
     planId: number,
-    userPlanId?: number,
+    isPopular: boolean,
+    isCurrentPlan: boolean,
     planName: string
 }
 
-export default function GetPlanButton({ mostPopularPlanId, planId, userPlanId, planName }: Props) {
+export default function GetPlanButton({ planId, isPopular, isCurrentPlan, planName }: Props) {
     const handleClick = () => {
         fetch('/api/checkout', {
             method: 'POST',
@@ -20,9 +20,6 @@ export default function GetPlanButton({ mostPopularPlanId, planId, userPlanId, p
         }).then(res => res.json())
             .then(data => window.location.href = data.stripeUrl)
     }
-
-    const isPopular = mostPopularPlanId === planId
-    const isCurrentPlan = planId === userPlanId
 
     return (
         <Button

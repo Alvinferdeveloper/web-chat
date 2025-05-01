@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import GetPlanButton from "./getPlanButton";
 import { cn } from "@/lib/utils";
+import { getUserSuscriptions } from "../actions/suscriptions";
 
 interface Plan {
     id: string,
@@ -20,14 +21,15 @@ export default async function PricingCards() {
     const { data: plans } = await getPlans();
     const mostPopularPlanId = await getMostPopularPlanId();
     const session = await getServerSession(authOptions);
+    const userSuscriptions = await getUserSuscriptions(session?.user.id!);
 
     return (
         <div className="flex justify-center h-[70%]">
             <div className="grid md:grid-cols-3 gap-6">
                 {plans?.map((plan: Plan) => {
                     const isPopular = plan.id === mostPopularPlanId;
-                    const isCurrentPlan = plan.id === session?.user.plan;
-
+                    const isCurrentPlan = userSuscriptions.includes(plan.id);
+                    console.log(isCurrentPlan);
                     return (
                         <Card
                             key={plan.name}
@@ -75,9 +77,9 @@ export default async function PricingCards() {
                                     isCurrentPlan && "cursor-not-allowed"
                                 )}>
                                     <GetPlanButton
-                                        mostPopularPlanId={Number(mostPopularPlanId)}
+                                        isPopular={isPopular}
+                                        isCurrentPlan={isCurrentPlan}
                                         planId={Number(plan.id)}
-                                        userPlanId={session?.user.plan ? Number(session?.user.plan) : undefined}
                                         planName={plan.name}
                                     />
                                 </div>
