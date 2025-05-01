@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { User2 } from "lucide-react";
 import { orbitron } from "../../font";
 import CustomDropdownMenu from "../customDropDownMenu";
+import ProfileDropDownMenu from "../chat/profileDropDownMenu";
 
 export default function Header() {
     const { data: session } = useSession();
@@ -12,12 +13,14 @@ export default function Header() {
             <p className={`${orbitron.className} text-2xl text-white`}>Mi logo </p>
             <CustomDropdownMenu trigger={
                 <Avatar className="cursor-pointer hover:opacity-80">
-                    { session?.user?.image && <AvatarImage src={session?.user?.image} />}
+                    {session?.user?.image && <AvatarImage src={session?.user?.image} />}
                     <AvatarFallback className="bg-gray-200">
                         <User2 className="h-5 w-5 text-gray-600" />
                     </AvatarFallback>
                 </Avatar>
-            } />
+            }>
+                <ProfileDropDownMenu />
+            </CustomDropdownMenu>
         </header>
     )
 }
