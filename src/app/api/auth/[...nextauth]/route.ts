@@ -2,7 +2,7 @@ import NextAuth, { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from 'next-auth/providers/github';
 import { AuthService } from "../../services/auth.service";
-import { PlanService } from "../../services/plan.service";
+import { SuscriptionService } from "../../services/suscription.service";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -41,7 +41,7 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session,token }) {
       session.user.id = token.sub;
-      const userPlan = await PlanService.getUserPlan(null, token.sub);
+      const userPlan = await SuscriptionService.getUserSuscription(null, token.sub);
       session.user.plan = userPlan;
       return session;
     }
