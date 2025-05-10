@@ -30,30 +30,15 @@ export class SuscriptionService {
             return false;
         }
     }
-    static async getUserSuscription(planId: number | null, userId: string | undefined) {
-        let plan;
-        if (!planId) {
-            plan = await supabase
-                .from("plan")
-                .select('id')
-                .eq("name", 'FREE')
-                .single();
-        }
-        else {
-            plan = await supabase
-                .from("plan")
-                .select('id')
-                .eq("id", planId)
-                .single();
-        }
-        const { data, error } = await supabase
-            .from("suscription")
-            .select("plan_id")
-            .eq('plan_id', plan.data?.id)
-            .eq('user_id', userId)
-            .eq("status", "ACTIVE")
-            .single();
-        return error ? null : data?.plan_id;
+    static async suscriptionExists(planId: number, userId: string) {
+        const { count, error } = await supabase
+        .from("suscription")
+        .select("id", { count: "exact", head: true })
+        .eq("plan_id", planId)
+        .eq("user_id", userId)
+        .eq("status", "ACTIVE");
+      const exists = (count ?? 0) > 0;
+      return exists;
     }
 
     static async addSuscription(planId: number, userId: string) {
@@ -73,4 +58,6 @@ export class SuscriptionService {
             throw new Error(error.message);
         }
     }
+
+
 }

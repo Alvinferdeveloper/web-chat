@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { PlanService } from '../services/plan.service';
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
+import { SuscriptionService } from '../services/suscription.service';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 export async function POST(req: NextRequest) {
@@ -14,6 +15,10 @@ export async function POST(req: NextRequest) {
     const plan = await PlanService.getPlanById(planId);
     if (!plan) {
         return NextResponse.json({ error: "Plan not found" }, { status: 404 });
+    }
+    const subscriptionExists = await SuscriptionService.suscriptionExists(planId, userSession.user.id);
+    if(subscriptionExists){
+        return NextResponse.json({ error: "Subscription already exists" }, { status: 400 });
     }
     const session = await stripe.checkout.sessions.create({
         success_url: `${process.env.NEXT_PUBLIC_APP_URL}/plans`,
