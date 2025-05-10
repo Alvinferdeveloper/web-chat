@@ -2,16 +2,16 @@
 import { createContext, useState, ReactNode, useContext } from "react";
 
 type GlobalContextType = {
-  activePlan: number;
-  setActivePlan: (plan: number) => void;
+  activeSubscription: Suscription;
+  setActiveSubscription: (suscription: Suscription) => void;
 };
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
 
 export function GlobalContextProvider({ children }: { children: ReactNode }) {
-  const [activePlan, setActivePlan] = useState(0);
+  const [activeSubscription, setActiveSubscription] = useState({ id: "", planId: 0 });
   return (
-    <GlobalContext.Provider value={{ activePlan, setActivePlan }}>
+    <GlobalContext.Provider value={{ activeSubscription, setActiveSubscription }}>
       {children}
     </GlobalContext.Provider>
   );

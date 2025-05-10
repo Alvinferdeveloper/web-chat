@@ -19,9 +19,9 @@ interface Plan {
 }
 
 export default function PlansDropDownMenu() {
-    const { activePlan, setActivePlan } = useGlobalContext();
+    const { activeSubscription, setActiveSubscription } = useGlobalContext();
     const [plans, setPlans] = useState<Plan[]>([]);
-    const [userSuscriptions, setUserSuscriptions] = useState<number[]>([]);
+    const [userSuscriptions, setUserSuscriptions] = useState<Suscription[]>([]);
     const { data: session } = useSession();
     const router = useRouter();
     useEffect(() => {
@@ -38,19 +38,24 @@ export default function PlansDropDownMenu() {
         const fetchUserActiveSuscriptions = async () => {
             const userActiveSuscriptions = await getUserSuscriptions(session?.user.id!);
             setUserSuscriptions(userActiveSuscriptions);
-            setActivePlan(userActiveSuscriptions[userActiveSuscriptions.length - 1]);
         }
         fetchUserActiveSuscriptions();
     }, [session]);
 
+    useEffect(() => {
+        if (userSuscriptions.length > 0) {
+            setActiveSubscription({ planId: userSuscriptions[userSuscriptions.length - 1].planId, id: userSuscriptions[userSuscriptions.length - 1].id });
+        }
+    }, [userSuscriptions]);
+
     const handleActivePlan = (planId: number) => {
-        userSuscriptions.find(suscription => suscription == planId) ? setActivePlan(planId) : null;
+        userSuscriptions.find(suscription => suscription.planId == planId) ? setActiveSubscription({ planId, id: userSuscriptions[userSuscriptions.length - 1].id }) : null;
     }
     return (
         <DropdownMenuContent align="start" className="w-[280px] rounded-xl  bg-gray-900 text-gray-100 border-gray-800 p-0">
             <div className="flex flex-col space-y-1 p-1">
                 {plans.map((plan) => {
-                    const upgradable = userSuscriptions.every(suscription => suscription != plan.id)
+                    const upgradable = userSuscriptions.every(suscription => suscription.planId != plan.id)
                     return (
                         <DropdownMenuItem
                             key={plan.id}
@@ -73,7 +78,7 @@ export default function PlansDropDownMenu() {
                                         Upgrade
                                     </Button>
                                 )}
-                                {plan.id == activePlan && <Check className="h-5 w-5 text-green-500" />}
+                                {plan.id == activeSubscription.planId && <Check className="h-5 w-5 text-green-500" />}
                             </div>
                         </DropdownMenuItem>
                     )

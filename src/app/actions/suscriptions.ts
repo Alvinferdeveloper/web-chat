@@ -1,15 +1,14 @@
 "use server"
 import supabase from "@/lib/supabase";
-export async function getUserSuscriptions(userId: string): Promise<number[]> {
+
+export async function getUserSuscriptions(userId: string): Promise<Suscription[]> {
     const { data, error } = await supabase
         .from('suscription')
-        .select('plan_id')
+        .select('plan_id, id')
         .eq('user_id', userId)
         .eq('status', 'ACTIVE');
-
     if (error || !data) {
         return [];
     }
-
-    return data.map(plan => plan.plan_id);
+    return data.map(subscription => ({ planId: subscription.plan_id, id: subscription.id }));
 }

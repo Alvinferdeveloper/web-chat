@@ -28,7 +28,7 @@ export default async function PricingCards() {
             <div className="grid md:grid-cols-3 gap-6">
                 {plans?.map((plan: Plan) => {
                     const isPopular = plan.id === mostPopularPlanId;
-                    const isCurrentPlan = userSuscriptions.find(suscription => suscription == Number(plan.id)) ? true : false;
+                    const isCurrentPlan = userSuscriptions.find(suscription => suscription.planId == Number(plan.id)) ? true : false;
                     return (
                         <Card
                             key={plan.name}
