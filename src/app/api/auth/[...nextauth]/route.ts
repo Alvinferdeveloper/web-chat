@@ -41,8 +41,6 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session,token }) {
       session.user.id = token.sub;
-      const userPlan = await SuscriptionService.getUserSuscription(null, token.sub);
-      session.user.plan = userPlan;
       return session;
     }
   }
