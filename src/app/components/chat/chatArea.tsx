@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 import MessageCard from './messageCard';
 import { useSession } from 'next-auth/react';
-
+import { useGlobalContext } from '@/app/providers/globalContextProvider';
 
 interface Props {
     context: string,
@@ -14,9 +14,12 @@ interface Props {
 
 export default function ChatArea({ context }: Props) {
     const { data: session } = useSession();
+    const { activeSubscription } = useGlobalContext();
     const { messages, input, handleInputChange, handleSubmit } = useChat({
         body: {
             context,
+            subscriptionId: activeSubscription.id,
+            planId: activeSubscription.planId,
         },
     });
 

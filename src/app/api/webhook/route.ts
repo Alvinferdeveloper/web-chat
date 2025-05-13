@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { headers } from "next/headers";
 import { PaymentService } from "../services/payment.service";
 import { SuscriptionService } from "../services/suscription.service";
+import { UsageService } from "../services/usage.service";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 export async function POST(req: NextRequest) {
@@ -28,7 +29,8 @@ export async function POST(req: NextRequest) {
                     payment_method: 'STRIPE',
                     status: 'COMPLETED'
                 });
-                await SuscriptionService.addSuscription(Number(planId), userId);
+                const subscriptionId = await SuscriptionService.addSuscription(Number(planId), userId);
+                await UsageService.addInitialUsage(subscriptionId, userId);
             } catch (error) {
                 const err = error as Error;
                 return NextResponse.json({ error: err.message }, { status: 400 })

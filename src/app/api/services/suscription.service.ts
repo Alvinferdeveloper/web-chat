@@ -53,10 +53,11 @@ export class SuscriptionService {
                 start_date: startDate,
                 end_date: endDate,
                 status: 'ACTIVE'
-            });
+            }).select("id").single();
         if(error){
             throw new Error(error.message);
         }
+        return data.id;
     }
 
 
