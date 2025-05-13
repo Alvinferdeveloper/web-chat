@@ -14,6 +14,7 @@ export class UsageService {
             suscription_id: subscriptionId,
             user_id: userId
         });
+        
         if(error){
             throw new Error(error.message);
         }

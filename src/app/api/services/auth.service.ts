@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto'
 import supabase from '@/lib/supabase';
 import { SuscriptionService } from './suscription.service';
+import { UsageService } from './usage.service';
 
 interface AuthUser {
   id: string;
@@ -49,7 +50,10 @@ export class AuthService {
 
       if (!existingUser) {
         const newUserId = await this.createUser(user, account);
-        newUserId && await SuscriptionService.assignFreeSuscription(newUserId);
+        if(newUserId){
+            const subscriptionId = await SuscriptionService.assignFreeSuscription(newUserId);
+            await UsageService.addInitialUsage(subscriptionId, newUserId);
+        }
         return newUserId;
       }
       return existingUser.id;

@@ -1,7 +1,6 @@
 import supabase from "@/lib/supabase";
 export class SuscriptionService {
-    static async assignFreeSuscription(userId: string) {
-        try {
+    static async assignFreeSuscription(userId: string): Promise<string> {
             const { data: freePlan } = await supabase
                 .from('plan')
                 .select('id, tokens')
@@ -9,14 +8,14 @@ export class SuscriptionService {
                 .single();
 
             if (!freePlan) {
-                return false;
+                throw new Error("Free plan not found");
             }
 
             const startDate = new Date();
             const endDate = new Date();
             endDate.setDate(endDate.getDate() + 31);
 
-            const { error } = await supabase
+            const { data: suscription, error } = await supabase
                 .from('suscription')
                 .insert({
                     user_id: userId,
@@ -24,11 +23,11 @@ export class SuscriptionService {
                     start_date: startDate,
                     end_date: endDate,
                     status: 'ACTIVE'
-                });
-            return !error;
-        } catch (error) {
-            return false;
-        }
+                }).select("id").single();
+            if(error){
+                throw new Error(error.message);
+            }
+            return suscription?.id;
     }
     static async suscriptionExists(planId: number, userId: string) {
         const { count, error } = await supabase
