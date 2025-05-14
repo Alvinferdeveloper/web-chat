@@ -13,6 +13,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Free plan limit reached" }, { status: 400 });
         }
         const answer = await askModel(messages, context);
+        answer.usage.then(async (usage) => {
+            await UsageService.updateUsage(subscriptionId, usage.totalTokens);
+        });
         return answer.toDataStreamResponse();
     } catch (err) {
         const error = err as Error;
