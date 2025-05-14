@@ -15,7 +15,7 @@ interface MessageCardProps {
 export default function MessageCard({ role, content, userImage }: MessageCardProps) {
     const isUser = role === 'user';
     return (
-        <Card className="mb-4 max-w-[80%] mx-auto bg-gray-700 border-gray-600">
+        <Card className="mb-4 max-w-full mx-auto bg-gray-700 border-gray-600">
             <CardContent className="p-4">
                 <div className="flex items-start space-x-4">
                     <Avatar>
@@ -35,7 +35,7 @@ export default function MessageCard({ role, content, userImage }: MessageCardPro
                         <ReactMarkdown
                             className={cn(
                                 "prose",
-                                "text-md text-gray-300",
+                                "text-sm text-gray-300",
                                 "tracking-wide leading-loose"
                             )}
                             rehypePlugins={[rehypeHighlight]}

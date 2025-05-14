@@ -82,8 +82,8 @@ body {
 pre {
   width: 100%;
   color: #f8f8f2; /* Texto claro */
-  padding: 16px;
   border-radius: 8px;
+  padding: 10px 0;
   overflow-x: auto; /* Hacer scroll si el código es largo */
   white-space: pre-wrap;
   word-wrap: break-word;
