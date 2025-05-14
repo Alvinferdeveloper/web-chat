@@ -79,3 +79,17 @@ body {
   @apply bg-[#121734]
 }
 
+pre {
+  width: 100%;
+  color: #f8f8f2; /* Texto claro */
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto; /* Hacer scroll si el código es largo */
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+code {
+  font-family: "Fira Code", monospace;
+}
+

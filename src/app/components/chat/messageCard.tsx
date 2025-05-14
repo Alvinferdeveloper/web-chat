@@ -3,6 +3,8 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Bot } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import { cn } from "@/lib/utils";
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/atom-one-dark.css';
 
 interface MessageCardProps {
     role: string;
@@ -36,6 +38,7 @@ export default function MessageCard({ role, content, userImage }: MessageCardPro
                                 "text-md text-gray-300",
                                 "tracking-wide leading-loose"
                             )}
+                            rehypePlugins={[rehypeHighlight]}
                         >
                             {content}
                         </ReactMarkdown>
