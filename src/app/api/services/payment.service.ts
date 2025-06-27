@@ -1,7 +1,7 @@
 import supabase from "@/lib/supabase";
 import { randomUUID } from "crypto";
 
-type PaymentMethod = 'STRIPE';
+type PaymentMethod = 'STRIPE' | 'PAYPAL';
 type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
 
 interface Payment {
@@ -10,6 +10,7 @@ interface Payment {
     amount: number;
     payment_method: PaymentMethod;
     status: PaymentStatus;
+    transaction_id?: string;
 }
 export class PaymentService {
     static async addPayment(payment: Payment) {
