@@ -3,13 +3,17 @@ import { PayPalService } from '../../services/paypal.service';
 import { PaymentService } from '../../services/payment.service';
 import { SuscriptionService } from '../../services/suscription.service';
 import { UsageService } from '../../services/usage.service';
+import { requireAuth } from '../../lib/auth-helper';
 
 export async function POST(req: NextRequest) {
   try {
-    const { orderID, planId, userId } = await req.json();
-    console.log(orderID, planId, userId);
-
-    if (!orderID || !planId || !userId) {
+    const auth = await requireAuth(req);
+    if ('error' in auth) return auth.error;
+    
+    const { orderID, planId } = await req.json();
+    const userId = auth.userId;
+    
+    if (!orderID || !planId) {
       return NextResponse.json(
         { error: 'Missing required parameters' },
         { status: 400 }

@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server';
 import { askModel } from '@/app/api/services/textProvider.service';
 import { UsageService } from '../services/usage.service';
+import { requireAuth } from '../lib/auth-helper';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
+    const auth = await requireAuth(req);
+    if ('error' in auth) return auth.error;
+    
     const { messages, context, subscriptionId, planId } = await req.json();
+    
     try {
         const isLimitReached = await UsageService.isFreePlanLimitReached(subscriptionId, planId);
         if (isLimitReached) {
