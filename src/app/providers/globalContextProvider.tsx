@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useState, ReactNode, useContext } from "react";
+import { Suscription } from "@/app/types/types";
 
 type GlobalContextType = {
   activeSubscription: Suscription;

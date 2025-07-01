@@ -1,5 +1,6 @@
 "use server"
 import supabase from "@/lib/supabase";
+import { Suscription } from "@/app/types/types";
 
 export async function getUserSuscriptions(userId: string): Promise<Suscription[]> {
     const { data, error } = await supabase
