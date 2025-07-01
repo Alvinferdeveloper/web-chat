@@ -11,6 +11,7 @@ import { getUserSuscriptions } from "@/app/actions/suscriptions";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import getPlanIcon from "@/app/components/utils/getPlanIcon";
+import { Suscription } from "@/app/types/types";
 
 interface Plan {
     id: number,

@@ -1,21 +1,27 @@
 "use client"
-import { useChat } from 'ai/react'
-import { Send } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
-import MessageCard from './messageCard';
+import { Message, useChat } from 'ai/react'
 import { useSession } from 'next-auth/react';
+
 import { useGlobalContext } from '@/app/providers/globalContextProvider';
+import { useChatScroll } from '@/app/hooks/useChatScroll';
+import { useConversationSaver } from '@/app/hooks/useConversationSaver';
+
+import MessageCard from './messageCard';
+import ChatInput from './chatInput';
 
 interface Props {
-    context: string,
+    url: string;
+    summary: string;
+    context: string;
+    initialMessages?: Message[];
 }
 
-export default function ChatArea({ context }: Props) {
+export default function ChatArea({ url, summary, context, initialMessages }: Props) {
     const { data: session } = useSession();
     const { activeSubscription } = useGlobalContext();
+
     const { messages, input, handleInputChange, handleSubmit } = useChat({
+        initialMessages,
         body: {
             context,
             subscriptionId: activeSubscription.id,
@@ -23,31 +29,31 @@ export default function ChatArea({ context }: Props) {
         },
     });
 
-    useEffect(() => {
-        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-    }, [messages]);
+    const messagesEndRef = useChatScroll(messages);
+    const { isSaving, isSaved, saveConversation } = useConversationSaver();
+
+    const handleSave = () => {
+        saveConversation({ url, summary, context, messages });
+    };
+
     return (
-        <div className="flex-1 flex flex-col">
-            <div className="flex-1 p-4">
+        <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 overflow-y-auto p-4">
                 {messages.map((m) => (
                     <MessageCard key={m.id} role={m.role} content={m.content} userImage={session?.user.image || undefined} />
                 ))}
+                <div ref={messagesEndRef} />
             </div>
 
-            {/* Input area */}
-            <form onSubmit={handleSubmit} className="fixed bottom-4 flex justify-center w-full left-0">
-                <div className="flex space-x-2 w-full max-w-4xl">
-                    <Input
-                        value={input}
-                        onChange={handleInputChange}
-                        placeholder="Escribe tu mensaje aquí..."
-                        className="flex-1 h-12 bg-gray-700 border-gray-600 text-white placeholder-neutral-50"
-                    />
-                    <Button type="submit" className="bg-blue-600 h-12 w-14 hover:bg-blue-700">
-                        <Send className="h-4 w-4" />
-                    </Button>
-                </div>
-            </form>
+            <ChatInput
+                input={input}
+                handleInputChange={handleInputChange}
+                handleSubmit={handleSubmit}
+                handleSave={handleSave}
+                isSaving={isSaving}
+                isSaved={isSaved}
+                canSave={messages.length > 0}
+            />
         </div>
     )
 }
