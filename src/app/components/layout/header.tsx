@@ -10,7 +10,7 @@ import PlansDropDownMenu from "../chat/plansDropDownMenu";
 export default function Header() {
     const { data: session } = useSession();
     return (
-        <header className="w-full h-10 left-0 fixed flex justify-between px-7 pt-6 items-center z-30">
+        <header className="w-full h-10 left-0 fixed flex justify-between px-16 pt-6 items-center z-30">
             <CustomDropdownMenu trigger={<div className={`${orbitron.className} text-2xl text-white cursor-pointer hover:opacity-80`}>Mi logo </div>}>
                 <PlansDropDownMenu />
             </CustomDropdownMenu>
