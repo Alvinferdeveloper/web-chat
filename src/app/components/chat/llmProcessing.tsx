@@ -7,9 +7,10 @@ import { Conversation } from '@/app/types/types';
 
 interface Props {
     initialConversation: Conversation | null;
+    onConversationSaved: (conversation: Conversation) => void;
 }
 
-export default function LlmProcessing({ initialConversation }: Props) {
+export default function LlmProcessing({ initialConversation, onConversationSaved }: Props) {
     const { url, getWebSummary, error, isProcessing, summary, context, setWebContext, clearContext } = useGetWebContext();
 
     useEffect(() => {
@@ -34,6 +35,7 @@ export default function LlmProcessing({ initialConversation }: Props) {
                 summary={summary} 
                 context={context} 
                 initialMessages={initialConversation?.messages} 
+                onConversationSaved={onConversationSaved}
             />
         </div>
     )

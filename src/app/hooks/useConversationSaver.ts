@@ -17,7 +17,7 @@ export function useConversationSaver() {
     const [isSaved, setIsSaved] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const saveConversation = async (conversationData: ConversationData) => {
+    const saveConversation = async (conversationData: ConversationData): Promise<any | null> => {
         const { url, summary, context, messages } = conversationData;
 
         if (messages.length === 0 || isSaving || isSaved) return;
@@ -52,13 +52,17 @@ export function useConversationSaver() {
                 throw new Error(errorData.error || 'No se pudo guardar la conversación');
             }
 
+            const newConversation = await response.json();
+
             setIsSaved(true);
             setTimeout(() => setIsSaved(false), 3000);
+            return newConversation;
 
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Ocurrió un error desconocido';
             console.error(errorMessage);
             setError(errorMessage);
+            return null;
         } finally {
             setIsSaving(false);
         }

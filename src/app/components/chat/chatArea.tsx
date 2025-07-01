@@ -8,15 +8,17 @@ import { useConversationSaver } from '@/app/hooks/useConversationSaver';
 
 import MessageCard from './messageCard';
 import ChatInput from './chatInput';
+import { Conversation } from '@/app/types/types';
 
 interface Props {
     url: string;
     summary: string;
     context: string;
     initialMessages?: Message[];
+    onConversationSaved: (conversation: Conversation) => void;
 }
 
-export default function ChatArea({ url, summary, context, initialMessages }: Props) {
+export default function ChatArea({ url, summary, context, initialMessages, onConversationSaved }: Props) {
     const { data: session } = useSession();
     const { activeSubscription } = useGlobalContext();
 
@@ -32,8 +34,11 @@ export default function ChatArea({ url, summary, context, initialMessages }: Pro
     const messagesEndRef = useChatScroll(messages);
     const { isSaving, isSaved, saveConversation } = useConversationSaver();
 
-    const handleSave = () => {
-        saveConversation({ url, summary, context, messages });
+    const handleSave = async () => {
+        const newConversation = await saveConversation({ url, summary, context, messages });
+        if (newConversation) {
+            onConversationSaved(newConversation);
+        }
     };
 
     return (

@@ -1,40 +1,24 @@
 "use client"
 
-import { useEffect, useState } from 'react';
-import { Conversation } from '@/app/types/types';
-import { Button } from '@/components/ui/button';
-import { PlusCircle, MessageSquare } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { PlusCircle, MessageSquare, Loader2, AlertTriangle } from "lucide-react";
+import { Conversation } from "@/app/types/types";
 
 interface Props {
+    conversations: Conversation[];
+    isLoading: boolean;
+    error: string | null;
     onSelectConversation: (conversation: Conversation) => void;
     onNewConversation: () => void;
 }
 
-export default function ConversationHistory({ onSelectConversation, onNewConversation }: Props) {
-    const [conversations, setConversations] = useState<Conversation[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        const fetchConversations = async () => {
-            try {
-                setIsLoading(true);
-                const response = await fetch('/api/conversations');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch conversations');
-                }
-                const data = await response.json();
-                setConversations(data);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'An unknown error occurred');
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchConversations();
-    }, []);
-
+export default function ConversationHistory({
+    conversations,
+    isLoading,
+    error,
+    onSelectConversation,
+    onNewConversation
+}: Props) {
     return (
         <div className="bg-gray-800 p-4 pt-14 flex flex-col h-screen w-1/5">
             <h2 className="text-xl font-bold text-white mb-4">Historial</h2>
@@ -43,16 +27,24 @@ export default function ConversationHistory({ onSelectConversation, onNewConvers
                 Nuevo Chat
             </Button>
             <div className="flex-grow overflow-y-auto">
-                {isLoading && <p className="text-gray-400">Cargando historial...</p>}
-                {error && <p className="text-red-500">Error: {error}</p>}
-                {!isLoading && !error && (
+                {isLoading ? (
+                    <div className="flex justify-center items-center h-full">
+                        <Loader2 className="h-6 w-6 text-white animate-spin" />
+                    </div>
+                ) : error ? (
+                    <div className="flex flex-col items-center text-red-400">
+                        <AlertTriangle className="h-6 w-6 mb-2" />
+                        <p>{error}</p>
+                    </div>
+                ) : (
                     <ul>
-                        {conversations.map((convo) => (
-                            <li key={convo.id} 
-                                onClick={() => onSelectConversation(convo)} 
-                                className="flex items-center p-2 text-white rounded-md hover:bg-gray-700 cursor-pointer mb-2">
+                        {conversations.map((conv) => (
+                            <li key={conv.id}
+                                onClick={() => onSelectConversation(conv)}
+                                className="flex items-center p-2 text-white rounded-md cursor-pointer hover:bg-gray-700 transition-colors"
+                            >
                                 <MessageSquare className="mr-3 h-5 w-5" />
-                                <span className="flex-grow truncate">{convo.title}</span>
+                                <span className="truncate">{conv.title}</span>
                             </li>
                         ))}
                     </ul>
