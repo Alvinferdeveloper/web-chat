@@ -3,55 +3,16 @@ import { DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
-import { useEffect } from "react";
 import { useGlobalContext } from "@/app/providers/globalContextProvider";
-import { getPlans } from "@/app/actions/plan";
-import { useState } from "react";
-import { getUserSuscriptions } from "@/app/actions/suscriptions";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import getPlanIcon from "@/app/components/utils/getPlanIcon";
-import { Suscription } from "@/app/types/types";
-
-interface Plan {
-    id: number,
-    name: string;
-    subtitle: string;
-}
+import { usePlans } from "@/app/hooks/usePlans";
 
 export default function PlansDropDownMenu() {
-    const { activeSubscription, setActiveSubscription } = useGlobalContext();
-    const [plans, setPlans] = useState<Plan[]>([]);
-    const [userSuscriptions, setUserSuscriptions] = useState<Suscription[]>([]);
-    const { data: session } = useSession();
+    const { activeSubscription } = useGlobalContext();
+    const { plans, userSuscriptions, handleActivePlan } = usePlans();
     const router = useRouter();
-    useEffect(() => {
-        const fetchPlans = async () => {
-            const plans = await getPlans();
-            if (plans.data) {
-                setPlans(plans.data);
-            }
-        }
-        fetchPlans();
-    }, []);
 
-    useEffect(() => {
-        const fetchUserActiveSuscriptions = async () => {
-            const userActiveSuscriptions = await getUserSuscriptions(session?.user.id!);
-            setUserSuscriptions(userActiveSuscriptions);
-        }
-        fetchUserActiveSuscriptions();
-    }, [session]);
-
-    useEffect(() => {
-        if (userSuscriptions.length > 0) {
-            setActiveSubscription({ planId: userSuscriptions[userSuscriptions.length - 1].planId, id: userSuscriptions[userSuscriptions.length - 1].id });
-        }
-    }, [userSuscriptions]);
-
-    const handleActivePlan = (planId: number) => {
-        userSuscriptions.find(suscription => suscription.planId == planId) ? setActiveSubscription({ planId, id: userSuscriptions[userSuscriptions.length - 1].id }) : null;
-    }
     return (
         <DropdownMenuContent align="start" className="w-[280px] rounded-xl  bg-gray-900 text-gray-100 border-gray-800 p-0">
             <div className="flex flex-col space-y-1 p-1">

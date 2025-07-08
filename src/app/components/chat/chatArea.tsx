@@ -28,7 +28,7 @@ export default function ChatArea({ context, initialMessages, conversationId, syn
             conversationId: conversationId,
         },
         onFinish: async (message) => {
-            syncHistoryMessages([{ role: "user", content: input, id: (Date.now() * Math.random()).toString() },message]);
+            syncHistoryMessages([{ role: "user", content: input, id: (Date.now() * Math.random()).toString() }, message]);
             await updateConversation({
                 conversationId,
                 newMessages: [{ role: "user", content: input }, message]
