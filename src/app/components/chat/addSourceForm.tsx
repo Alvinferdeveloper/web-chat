@@ -14,9 +14,7 @@ export default function AddSourceForm({ onAddSource }: Props) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('submit')
         if (!sourceUrl) return;
-        console.log(sourceUrl)
         setIsSubmitting(true);
         await onAddSource(sourceUrl);
         setIsSubmitting(false);

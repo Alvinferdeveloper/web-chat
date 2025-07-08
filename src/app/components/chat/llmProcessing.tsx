@@ -20,7 +20,7 @@ interface Props {
 
 export default function LlmProcessing({ initialConversation, toggleSidebar, isSidebarOpen, syncHistoryMessages }: Props) {
     const { data: session } = useSession();
-    const { url, getWebSummary, error, isProcessing, summary, context, setWebContext, clearContext } = useGetWebContext();
+    const { url, getWebSummary, error, isProcessing, summary, context, setWebContext, clearContext, updateConversationContext } = useGetWebContext();
     const [conversationId, setConversationId] = useState<string | null>(null);
 
     useEffect(() => {
@@ -88,8 +88,10 @@ export default function LlmProcessing({ initialConversation, toggleSidebar, isSi
                 const data = await response.json();
                 throw new Error(data.error || 'Failed to add source.');
             }
+            const json = await response.json();
+            updateConversationContext(json.context)
             toast.success('Source added successfully! The context has been updated.', { id: toastId });
-            // Optionally, you could refresh the context here if needed
+
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
             toast.error(errorMessage, { id: toastId });

@@ -42,6 +42,10 @@ export default function useGetWebContext() {
         setIsProcessing(false);
     }
 
+    function updateConversationContext(context: string){
+        setContext(context)
+    }
+
     function clearContext() {
         setUrl('');
         setSummary('');
@@ -49,5 +53,5 @@ export default function useGetWebContext() {
         setError('');
     }
 
-    return { url, getWebSummary, error, isProcessing, summary, context, setWebContext, clearContext };
+    return { url, getWebSummary, error, isProcessing, summary, context, setWebContext, clearContext, updateConversationContext };
 }

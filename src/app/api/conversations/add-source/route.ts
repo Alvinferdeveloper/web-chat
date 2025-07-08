@@ -45,6 +45,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json({
             message: 'Source added successfully',
+            context: updatedContext,
             conversationId: conversationId,
         });
 
