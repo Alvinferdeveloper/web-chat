@@ -34,7 +34,7 @@ export function useChatManager(initialConversation: Conversation | null, context
 
                     const savedConversation: Conversation = await response.json();
                     setConversationId(savedConversation.id);
-                    setConversations(prev => [...prev, savedConversation]);
+                    setConversations(prev => [savedConversation, ...prev]);
                     toast.success('Conversation saved!', { id: toastId });
                 } catch (err) {
                     const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
