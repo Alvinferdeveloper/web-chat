@@ -1,9 +1,9 @@
 "use client"
-
 import { useState, useEffect } from "react";
 import LlmProcessing from "./llmProcessing";
 import ConversationHistory from "./conversationHistory";
 import { Conversation } from "@/app/types/types";
+import { Message } from "ai/react"
 
 export default function ChatWrapper() {
     const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
@@ -44,9 +44,17 @@ export default function ChatWrapper() {
         setIsSidebarOpen(prev => !prev);
     };
 
-    const handleNewConversationAdded = (newConversation: Conversation) => {
-        setConversations(prev => [newConversation, ...prev]);
-        setSelectedConversation(newConversation);
+    const syncHistoryMessages = (messages: Message[]) => {
+        setConversations(prevData =>
+            prevData.map(conversation =>
+                conversation.id === selectedConversation?.id
+                    ? {
+                        ...conversation,
+                        messages: [...(conversation.messages || []), ...messages]
+                    }
+                    : conversation
+            )
+        );
     };
 
     return (
@@ -64,9 +72,9 @@ export default function ChatWrapper() {
                 <LlmProcessing
                     key={selectedConversation?.id || 'new'}
                     initialConversation={selectedConversation}
-                    onConversationSaved={handleNewConversationAdded}
                     toggleSidebar={toggleSidebar}
                     isSidebarOpen={isSidebarOpen}
+                    syncHistoryMessages={syncHistoryMessages}
                 />
             </div>
         </div>

@@ -19,7 +19,7 @@ export default function useGetWebContext() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ url: newUrl }),
+            body: JSON.stringify({ urls: [newUrl] }),
         });
         const json = await res.json();
         console.log(json)
@@ -30,8 +30,8 @@ export default function useGetWebContext() {
         }
 
         setError('');
-        setSummary(json.summary);
         setContext(json.context);
+        setSummary(json.summary || '');
     }
 
     function setWebContext(url: string, summary: string, context: string) {

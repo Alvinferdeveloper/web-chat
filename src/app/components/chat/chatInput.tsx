@@ -7,20 +7,12 @@ interface ChatInputProps {
     input: string;
     handleInputChange: (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => void;
     handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-    handleSave: () => void;
-    isSaving: boolean;
-    isSaved: boolean;
-    canSave: boolean;
 }
 
 export default function ChatInput({
     input,
     handleInputChange,
     handleSubmit,
-    handleSave,
-    isSaving,
-    isSaved,
-    canSave
 }: ChatInputProps) {
     return (
         <form onSubmit={handleSubmit} className="p-4">
@@ -33,15 +25,6 @@ export default function ChatInput({
                 />
                 <Button type="submit" className="bg-blue-600 h-12 w-14 hover:bg-blue-700">
                     <Send className="h-4 w-4" />
-                </Button>
-                <Button
-                    type="button"
-                    onClick={handleSave}
-                    disabled={isSaving || isSaved || !canSave}
-                    className="bg-green-600 h-12 w-36 hover:bg-green-700 disabled:bg-gray-500 flex items-center justify-center"
-                >
-                    {isSaving ? 'Guardando...' : isSaved ? '¡Guardado!' : 'Guardar Chat'}
-                    {!isSaving && !isSaved && <Save className="h-4 w-4 ml-2" />}
                 </Button>
             </div>
         </form>

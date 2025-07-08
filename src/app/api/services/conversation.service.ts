@@ -1,5 +1,6 @@
 import supabase from '@/lib/supabase';
-import { Conversation, Message } from '@/app/types/types';
+import { Conversation } from '@/app/types/types';
+import { Message } from "ai/react"
 
 type CreateMessage = Omit<Message, 'id' | 'conversation_id' | 'created_at'>;
 
@@ -9,12 +10,10 @@ type CreateConversationPayload = {
     summary: string;
     context: string;
     title?: string;
-    messages: CreateMessage[];
 };
 
 export const conversationService = {
-    async createConversation({ userId, url, summary, context, title, messages }: CreateConversationPayload): Promise<Conversation> {
-        // 1. Create the conversation
+    async createConversation({ userId, url, summary, context, title }: CreateConversationPayload): Promise<Conversation> {
         const { data: conversationData, error: conversationError } = await supabase
             .from('conversations')
             .insert({
@@ -32,30 +31,9 @@ export const conversationService = {
             throw new Error('Could not create conversation.');
         }
 
-        const conversationId = conversationData.id;
-
-        // 2. Add conversation_id to each message
-        const messagesToInsert = messages.map(message => ({
-            ...message,
-            conversation_id: conversationId,
-        }));
-
-        // 3. Insert all messages
-        const { data: messagesData, error: messagesError } = await supabase
-            .from('messages')
-            .insert(messagesToInsert)
-            .select();
-
-        if (messagesError) {
-            console.error('Error saving messages:', messagesError);
-            // Optional: Delete the conversation if messages fail to save
-            await supabase.from('conversations').delete().eq('id', conversationId);
-            throw new Error('Could not save messages.');
-        }
-
         return {
             ...conversationData,
-            messages: messagesData,
+            messages: [],
         };
     },
 
@@ -78,7 +56,7 @@ export const conversationService = {
     },
 
     async getConversationById(id: string): Promise<Conversation | null> {
-         const { data, error } = await supabase
+        const { data, error } = await supabase
             .from('conversations')
             .select(`
                 *,
@@ -89,13 +67,32 @@ export const conversationService = {
 
         if (error) {
             console.error('Error fetching conversation:', error);
-            // It might not be an "error" if the conversation just doesn't exist
-            if (error.code === 'PGRST116') { // "PostgREST error: Row not found"
+            if (error.code === 'PGRST116') {
                 return null;
             }
             throw new Error('Could not fetch conversation.');
         }
 
         return data;
-    }
+    },
+
+    async appendMessagesToConversation(conversationId: string, newMessages: CreateMessage[]): Promise<void> {
+        if (newMessages.length === 0) {
+            return;
+        }
+
+        const messagesToInsert = newMessages.map(message => ({
+            ...message,
+            conversation_id: conversationId,
+        }));
+
+        const { error: insertError } = await supabase
+            .from('messages')
+            .insert(messagesToInsert);
+
+        if (insertError) {
+            console.error('Error appending messages:', insertError);
+            throw new Error('Could not append messages to conversation.');
+        }
+    },
 };
