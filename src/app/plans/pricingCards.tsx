@@ -18,10 +18,10 @@ interface Plan {
 }
 
 export default async function PricingCards() {
-    const { data: plans } = await getPlans();
+    const plans = await getPlans();
     const mostPopularPlanId = await getMostPopularPlanId();
     const session = await getServerSession(authOptions);
-    const userSuscriptions = await getUserSuscriptions(session?.user.id!);
+    const userSuscriptions = (await getUserSuscriptions(session?.user.id!)) ?? [];
 
     return (
         <div className="flex justify-center h-[70%]">

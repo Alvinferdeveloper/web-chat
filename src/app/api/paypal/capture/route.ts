@@ -4,6 +4,7 @@ import { PaymentService } from '../../services/payment.service';
 import { SuscriptionService } from '../../services/suscription.service';
 import { UsageService } from '../../services/usage.service';
 import { requireAuth } from '../../lib/auth-helper';
+import { revalidateTag } from 'next/cache';
 
 export async function POST(req: NextRequest) {
   try {
@@ -46,6 +47,8 @@ export async function POST(req: NextRequest) {
     
     // Agregar uso inicial
     await UsageService.addInitialUsage(subscriptionId, userId);
+
+    revalidateTag('plans');
 
     return NextResponse.json({ success: true });
   } catch (error) {

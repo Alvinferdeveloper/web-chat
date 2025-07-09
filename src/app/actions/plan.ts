@@ -1,9 +1,20 @@
 'use server'
 import supabase from "@/lib/supabase";
+import { unstable_cache } from 'next/cache';
 
-export async function getPlans() {
-    return supabase.from('plan').select('*');
-}
+export const getPlans = unstable_cache(
+    async () => {
+        const { data, error } = await supabase.from('plan').select('*');
+        if (error) {
+            return null;
+        }
+        return data;
+    },
+    ['plans'],
+    {
+        tags: ['plans'],
+    }
+)
 
 export async function getMostPopularPlanId() {
     const { data, error } = await supabase.rpc('get_most_popular_plan')
