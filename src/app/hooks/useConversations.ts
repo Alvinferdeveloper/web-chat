@@ -12,7 +12,9 @@ export function useConversations() {
         const fetchConversations = async () => {
             try {
                 setIsLoading(true);
-                const response = await fetch('/api/conversations');
+                const response = await fetch('/api/conversations', {
+                    cache: "force-cache"
+                });
                 if (!response.ok) {
                     throw new Error('Failed to fetch conversations');
                 }
