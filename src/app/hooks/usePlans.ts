@@ -21,8 +21,8 @@ export function usePlans() {
     useEffect(() => {
         const fetchPlans = async () => {
             const plans = await getPlans();
-            if (plans.data) {
-                setPlans(plans.data);
+            if (plans) {
+                setPlans(plans);
             }
         }
         fetchPlans();
@@ -32,7 +32,7 @@ export function usePlans() {
         const fetchUserActiveSuscriptions = async () => {
             if (session?.user.id) {
                 const userActiveSuscriptions = await getUserSuscriptions(session.user.id);
-                setUserSuscriptions(userActiveSuscriptions);
+                setUserSuscriptions(userActiveSuscriptions ?? []);
             }
         }
         fetchUserActiveSuscriptions();
