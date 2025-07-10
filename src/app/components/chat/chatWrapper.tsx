@@ -9,7 +9,7 @@ import { useConversations } from "@/app/hooks/useConversations";
 export default function ChatWrapper() {
     const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const { conversations, isLoading, error, syncHistoryMessages, setConversations } = useConversations();
+    const { conversations, isLoading, error, syncHistoryMessages, setConversations, deleteConversation } = useConversations();
 
     const handleSelectConversation = (conversation: Conversation) => {
         setSelectedConversation(conversation);
@@ -33,6 +33,7 @@ export default function ChatWrapper() {
                 error={error}
                 onSelectConversation={handleSelectConversation}
                 onNewConversation={handleNewConversation}
+                onDeleteConversation={deleteConversation}
             />
             <div className={`relative h-full flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-4/5' : 'w-full'}`}>
                 <LlmProcessing

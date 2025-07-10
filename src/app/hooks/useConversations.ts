@@ -1,7 +1,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { Conversation } from '@/app/types/types';
+import { Conversation } from '@/app/types/conversation';
 import { Message } from 'ai/react';
+import toast from 'react-hot-toast';
 
 export function useConversations() {
     const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -13,7 +14,7 @@ export function useConversations() {
             try {
                 setIsLoading(true);
                 const response = await fetch('/api/conversations', {
-                    cache: "force-cache"
+                    cache: "no-store"
                 });
                 if (!response.ok) {
                     throw new Error('Failed to fetch conversations');
@@ -43,5 +44,26 @@ export function useConversations() {
         );
     }, []);
 
-    return { conversations, isLoading, error, syncHistoryMessages, setConversations };
+    const deleteConversation = useCallback(async (conversationId: string) => {
+        const toastId = toast.loading('Deleting conversation...');
+        try {
+            const response = await fetch(`/api/conversations/${conversationId}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to delete conversation.');
+            }
+
+            setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+            toast.success('Conversation deleted!', { id: toastId });
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+            toast.error(errorMessage, { id: toastId });
+            console.error('Error deleting conversation:', err);
+        }
+    }, []);
+
+    return { conversations, isLoading, error, syncHistoryMessages, deleteConversation, setConversations };
 }
