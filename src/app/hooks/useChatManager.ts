@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import toast from 'react-hot-toast';
 import { Conversation } from '@/app/types/types';
 
-export function useChatManager(initialConversation: Conversation | null, context: string | null, url: string, summary: string, setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>) {
+export function useChatManager(initialConversation: Conversation | null, context: string | null, urls: string[], summary: string, setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>) {
     const { data: session } = useSession();
     const [conversationId, setConversationId] = useState<string | null>(initialConversation?.id || null);
 
@@ -15,7 +15,7 @@ export function useChatManager(initialConversation: Conversation | null, context
                 try {
                     const newConversationData: Omit<Conversation, 'id' | 'created_at' | 'messages'> = {
                         user_id: session.user.id,
-                        url: url,
+                        url: urls.join(','),
                         summary: summary,
                         context: context,
                         title: summary.substring(0, 50) || 'New Web Chat',
@@ -44,7 +44,7 @@ export function useChatManager(initialConversation: Conversation | null, context
             }
         };
         saveInitialConversation();
-    }, [context, conversationId, session?.user?.id, url, summary, setConversations]);
+    }, [context, conversationId, session?.user?.id, urls, summary, setConversations]);
 
     const handleAddSource = async (sourceUrl: string) => {
         if (!conversationId) {

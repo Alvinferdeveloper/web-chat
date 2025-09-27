@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     try {
         const { data: conversation, error: findError } = await supabase
             .from('conversations')
-            .select('context, user_id')
+            .select('context, user_id, url')
             .eq('id', conversationId)
             .single();
 
@@ -35,10 +35,11 @@ export async function POST(req: Request) {
         const newContent = await scrappWeb([url]);
 
         const updatedContext = `${conversation.context}\n\n--- NUEVA FUENTE: ${url} ---\n\n${newContent}`;
+        const updatedUrl = `${conversation.url},${url}`;
 
         const { error: updateError } = await supabase
             .from('conversations')
-            .update({ context: updatedContext })
+            .update({ context: updatedContext, url: updatedUrl })
             .eq('id', conversationId);
 
         if (updateError) throw updateError;

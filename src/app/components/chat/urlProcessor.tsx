@@ -15,7 +15,7 @@ interface Props {
   summary: string,
 }
 
-export default function UrlProcessor({ url: initialUrl, getWebSummary, summary, error, isProcessing }: Props) {
+export default function UrlProcessor({ url: initialUrl, getWebSummary, error, isProcessing, summary }: Props) {
   const [isOpen, setIsOpen] = useState(true)
   const [url, setUrl] = useState(initialUrl || "")
 

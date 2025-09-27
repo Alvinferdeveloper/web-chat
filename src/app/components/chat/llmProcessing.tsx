@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { PanelLeftOpen } from 'lucide-react';
 import { useChatManager } from '@/app/hooks/useChatManager';
 import { Message } from "ai/react"
+import UrlListModal from './urlListModal';
 
 interface Props {
     initialConversation: Conversation | null;
@@ -19,12 +20,13 @@ interface Props {
 }
 
 export default function LlmProcessing({ initialConversation, toggleSidebar, isSidebarOpen, syncHistoryMessages, setConversations }: Props) {
-    const { url, getWebSummary, error, isProcessing, summary, context, setWebContext, clearContext, updateConversationContext } = useGetWebContext();
-    const { conversationId, handleAddSource } = useChatManager(initialConversation, context, url, summary, setConversations);
-
+    const { urls, getWebSummary, addUrl, removeUrl, error, isProcessing, summary, context, setWebContext, clearContext, updateConversationContext } = useGetWebContext();
+    const { conversationId, handleAddSource } = useChatManager(initialConversation, context, urls, summary, setConversations);
+    
     useEffect(() => {
         if (initialConversation) {
-            setWebContext(initialConversation.url, initialConversation.summary, initialConversation.context);
+            const initialUrls = initialConversation.url ? initialConversation.url.split(',') : [];
+            setWebContext(initialUrls, initialConversation.summary, initialConversation.context);
         } else {
             clearContext();
         }
@@ -34,6 +36,7 @@ export default function LlmProcessing({ initialConversation, toggleSidebar, isSi
         const newContext = await handleAddSource(sourceUrl);
         if (newContext) {
             updateConversationContext(newContext);
+            addUrl(sourceUrl);
         }
     };
 
@@ -49,8 +52,11 @@ export default function LlmProcessing({ initialConversation, toggleSidebar, isSi
                     <PanelLeftOpen className="h-6 w-6" />
                 </Button>
             )}
+            <div className="flex justify-end p-2">
+                {urls.length > 0 && <UrlListModal urls={urls} onRemoveUrl={removeUrl} />}
+            </div>
             <UrlProcessor
-                url={url}
+                url={urls.length > 0 ? urls[0] : ''}
                 getWebSummary={getWebSummary}
                 error={error}
                 isProcessing={isProcessing}
