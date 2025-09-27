@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { Conversation } from '@/app/types/conversation';
+import { Conversation } from '@/app/types/types';
 import { Message } from 'ai/react';
 import toast from 'react-hot-toast';
 
