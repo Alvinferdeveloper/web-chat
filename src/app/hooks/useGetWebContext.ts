@@ -14,7 +14,7 @@ export default function useGetWebContext() {
         setError('');
         setUrls([newUrl]);
 
-        const res = await fetch(`/api/getWebContext`, {
+        const res = await fetch(`/api/get-web-context`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -40,17 +40,19 @@ export default function useGetWebContext() {
     }
 
     async function removeUrl(urlToRemove: string) {
-        const newUrls = urls.filter(url => url !== urlToRemove);
-        setUrls(newUrls);
-
-        if (newUrls.length === 0) {
-            clearContext();
+        if (urls.length === 1) {
             return;
         }
+        const newUrls = urls.filter(url => url !== urlToRemove);
+
+        if (newUrls.length === 0) {
+            return;
+        }
+        setUrls(newUrls);
 
         setIsProcessing(true);
         try {
-            const res = await fetch(`/api/getWebContext`, {
+            const res = await fetch(`/api/get-web-context`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
