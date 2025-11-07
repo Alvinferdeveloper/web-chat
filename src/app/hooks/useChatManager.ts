@@ -15,7 +15,7 @@ export function useChatManager(initialConversation: Conversation | null, context
                 try {
                     const newConversationData: Omit<Conversation, 'id' | 'created_at' | 'messages'> = {
                         user_id: session.user.id,
-                        url: urls.join(','),
+                        url: urls,
                         summary: summary,
                         context: context,
                         title: summary.substring(0, 50) || 'New Web Chat',

@@ -35,7 +35,24 @@ export async function POST(req: Request) {
         const newContent = await scrappWeb([url]);
 
         const updatedContext = `${conversation.context}\n\n--- NUEVA FUENTE: ${url} ---\n\n${newContent}`;
-        const updatedUrl = `${conversation.url},${url}`;
+
+        let existingUrls: string[] = [];
+        if (Array.isArray(conversation.url)) {
+            existingUrls = conversation.url;
+        } else if (typeof conversation.url === 'string') {
+            try {
+                const parsed = JSON.parse(conversation.url);
+                if (Array.isArray(parsed)) {
+                    existingUrls = parsed;
+                } else {
+                    existingUrls = [conversation.url];
+                }
+            } catch (e) {
+                existingUrls = [conversation.url];
+            }
+        }
+
+        const updatedUrl = [...existingUrls, url];
 
         const { error: updateError } = await supabase
             .from('conversations')

@@ -13,9 +13,11 @@ interface Props {
   error: string,
   isProcessing: boolean,
   summary: string,
+  addSourceButton: React.ReactNode;
+  urlListButton: React.ReactNode;
 }
 
-export default function UrlProcessor({ url: initialUrl, getWebSummary, error, isProcessing, summary }: Props) {
+export default function UrlProcessor({ url: initialUrl, getWebSummary, error, isProcessing, summary, addSourceButton, urlListButton }: Props) {
   const [isOpen, setIsOpen] = useState(true)
   const [url, setUrl] = useState(initialUrl || "")
 
@@ -32,7 +34,11 @@ export default function UrlProcessor({ url: initialUrl, getWebSummary, error, is
       <Card className="w-full max-w-4xl bg-[#111827]/80 border-[#2d3748] backdrop-blur-sm">
         <CardHeader className="border-b border-[#2d3748] pb-3">
           <div className="flex justify-between items-center cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
-            <CardTitle className="text-white text-xl">Credenciales</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-white text-xl">Credenciales</CardTitle>
+              {urlListButton}
+              {addSourceButton}
+            </div>
             {isOpen ? <ChevronUp className="text-gray-400" /> : <ChevronDown className="text-gray-400" />}
           </div>
         </CardHeader>
