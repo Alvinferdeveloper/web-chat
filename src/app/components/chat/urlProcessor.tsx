@@ -9,8 +9,8 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 
 interface Props {
   url: string;
-  getWebSummary: (url: string) => void,
-  error: string,
+  getWebSummary: (url: string) => void | Promise<void>,
+  error: string | null,
   isProcessing: boolean,
   summary: string,
   addSourceButton: React.ReactNode;

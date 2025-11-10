@@ -22,8 +22,8 @@ export default function UrlListModal({ urls, onRemoveUrl }: Props) {
                 <div className="grid gap-4">
                     <h4 className="font-medium leading-none">Context URLs</h4>
                     <div className="grid gap-2">
-                        {urls.map((url) => (
-                            <div key={url} className="grid grid-cols-[1fr_auto] items-center gap-2">
+                        {urls.map((url, i) => (
+                            <div key={i} className="grid grid-cols-[1fr_auto] items-center gap-2">
                                 <div className="truncate text-sm font-mono bg-gray-700 p-2 rounded">{url}</div>
                                 <Button variant="ghost" size="icon" className="hover:bg-white/10" onClick={() => onRemoveUrl(url)}>
                                     <X className="h-4 w-4 text-gray-400" />

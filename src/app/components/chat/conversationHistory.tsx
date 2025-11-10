@@ -10,7 +10,6 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog";
 
 interface Props {
@@ -22,6 +21,7 @@ interface Props {
     onSelectConversation: (conversation: Conversation) => void;
     onNewConversation: () => void;
     onDeleteConversation: (conversationId: string) => void;
+    activeConversationId: string | null;
 }
 
 export default function ConversationHistory({
@@ -32,7 +32,8 @@ export default function ConversationHistory({
     error,
     onSelectConversation,
     onNewConversation,
-    onDeleteConversation
+    onDeleteConversation,
+    activeConversationId
 }: Props) {
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [conversationToDeleteId, setConversationToDeleteId] = useState<string | null>(null);
@@ -77,9 +78,10 @@ export default function ConversationHistory({
                         <ul>
                             {conversations.map((conv) => (
                                 <li key={conv.id}
-                                    className="flex items-center justify-between p-2 text-white rounded-md cursor-pointer hover:bg-gray-700 transition-colors overflow-hidden"
+                                    onClick={() => onSelectConversation(conv)}
+                                    className={`flex items-center justify-between p-2 text-white rounded-md cursor-pointer hover:bg-gray-700 transition-colors overflow-hidden ${conv.id === activeConversationId ? 'bg-gray-700' : ''}`}
                                 >
-                                    <div onClick={() => onSelectConversation(conv)} className="flex items-center min-w-0">
+                                    <div className="flex items-center min-w-0">
                                         <MessageSquare className="mr-3 h-5 w-5 flex-shrink-0" />
                                         <span className="truncate text-sm">{conv.title}</span>
                                     </div>

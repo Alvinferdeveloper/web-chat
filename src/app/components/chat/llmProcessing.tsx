@@ -2,64 +2,92 @@
 import { useEffect } from 'react';
 import UrlProcessor from "./urlProcessor";
 import ChatArea from "./chatArea";
-import useGetWebContext from "../../hooks/useGetWebContext";
 import { Conversation } from '@/app/types/types';
-import { Button } from '@/components/ui/button';
-import { PanelLeftOpen } from 'lucide-react';
-import { useChatManager } from '@/app/hooks/useChatManager';
 import { Message } from "ai/react"
 import UrlListModal from './urlListModal';
 import AddSourceModal from './AddSourceModal';
+import { useWebContextManager } from '@/app/hooks/state/useWebContextManager';
 
 interface Props {
     initialConversation: Conversation | null;
-    toggleSidebar: () => void;
-    isSidebarOpen: boolean;
-    syncHistoryMessages: (messages: Message[]) => void;
-    setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
+    syncHistoryMessages: (conversationId: string, messages: Message[]) => void;
+    onCreateConversation: (context: string, urls: string[], summary: string) => Promise<Conversation | undefined>;
+    onAddSource: (conversationId: string, url: string) => Promise<string | undefined>;
+    updateMessages: (conversationId: string, newMessages: Message[]) => Promise<void>;
+    onRemoveSource: (conversationId: string, urlToRemove: string) => Promise<Conversation | undefined>;
 }
 
-export default function LlmProcessing({ initialConversation, toggleSidebar, isSidebarOpen, syncHistoryMessages, setConversations }: Props) {
-    const { urls, getWebSummary, addUrl, removeUrl, error, isProcessing, summary, context, setWebContext, clearContext, updateConversationContext } = useGetWebContext();
-    const { conversationId, handleAddSource } = useChatManager(initialConversation, context, urls, summary, setConversations);
+export default function LlmProcessing({ 
+    initialConversation, 
+    syncHistoryMessages,
+    onCreateConversation,
+    onAddSource,
+    updateMessages,
+    onRemoveSource
+}: Props) {
+    const {
+        urls,
+        summary,
+        context,
+        isProcessing,
+        error,
+        processNewWebContext,
+        addUrlToContext,
+        loadContextFromConversation,
+        updateContext
+    } = useWebContextManager();
 
     useEffect(() => {
-        if (initialConversation) {
-            const initialUrls = initialConversation.url || [];
-            setWebContext(initialUrls, initialConversation.summary, initialConversation.context);
-        } else {
-            clearContext();
-        }
-    }, [initialConversation]);
+        loadContextFromConversation(initialConversation);
+    }, [initialConversation, loadContextFromConversation]);
 
-    const onAddSource = async (sourceUrl: string) => {
-        const newContext = await handleAddSource(sourceUrl);
-        if (newContext) {
-            updateConversationContext(newContext);
-            addUrl(sourceUrl);
+    const handleProcessUrl = async (url: string) => {
+        if (initialConversation) return; // Only for new conversations
+        try {
+            const { newContext, newSummary, newUrls } = await processNewWebContext(url);
+            await onCreateConversation(newContext, newUrls, newSummary);
+        } catch (err) {
+            console.error("Failed to process URL and create conversation", err);
         }
     };
 
+    const handleAddSource = async (sourceUrl: string) => {
+        if (!initialConversation) return;
+        try {
+            const newContext = await onAddSource(initialConversation.id, sourceUrl);
+            if (newContext) {
+                updateContext(newContext);
+                addUrlToContext(sourceUrl);
+            }
+        } catch (err) {
+            console.error("Failed to add source", err);
+        }
+    };
+
+    const handleRemoveSource = async (urlToRemove: string) => {
+        if (!initialConversation) return;
+        try {
+            const updatedConversation = await onRemoveSource(initialConversation.id, urlToRemove);
+            if (updatedConversation) {
+                loadContextFromConversation(updatedConversation);
+            }
+        } catch (err) {
+            console.error("Failed to remove source", err);
+        }
+    };
+
+    const conversationId = initialConversation?.id;
+
     return (
         <div className="relative h-full flex flex-col">
-            {!isSidebarOpen && (
-                <Button
-                    onClick={toggleSidebar}
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-4 left-4 z-50 text-white bg-gray-800 hover:bg-gray-700"
-                >
-                    <PanelLeftOpen className="h-6 w-6" />
-                </Button>
-            )}
             <UrlProcessor
                 url={urls.length > 0 ? urls[0] : ''}
-                getWebSummary={getWebSummary}
+                getWebSummary={handleProcessUrl}
                 error={error}
                 isProcessing={isProcessing}
                 summary={summary}
-                urlListButton={urls.length > 0 && <UrlListModal urls={urls} onRemoveUrl={removeUrl} />}
-                addSourceButton={context && conversationId && <AddSourceModal onAddSource={onAddSource} />}
+                urlListButton={urls.length > 0 && <UrlListModal urls={urls} onRemoveUrl={handleRemoveSource} />}
+                addSourceButton={!!conversationId && <AddSourceModal onAddSource={handleAddSource} />}
             />
 
             {context && conversationId && (
@@ -68,7 +96,8 @@ export default function LlmProcessing({ initialConversation, toggleSidebar, isSi
                         context={context}
                         initialMessages={initialConversation?.messages}
                         conversationId={conversationId}
-                        syncHistoryMessages={syncHistoryMessages}
+                        syncHistoryMessages={(messages) => syncHistoryMessages(conversationId, messages)}
+                        updateMessages={(newMessages) => updateMessages(conversationId, newMessages)}
                     />
                 </>
             )}

@@ -2,8 +2,7 @@
 import { useChat } from 'ai/react'
 import { useSession } from 'next-auth/react';
 import { useGlobalContext } from '@/app/providers/globalContextProvider';
-import { useChatScroll } from '@/app/hooks/useChatScroll';
-import { useConversationSaver } from '@/app/hooks/useConversationSaver';
+import { useChatScroll } from '@/app/hooks/ui/useChatScroll';
 import MessageCard from './messageCard';
 import ChatInput from './chatInput';
 import { Message } from 'ai/react';
@@ -13,12 +12,13 @@ interface Props {
     initialMessages?: Message[]
     conversationId: string;
     syncHistoryMessages: (messages: Message[]) => void;
+    updateMessages: (newMessages: Message[]) => Promise<void>;
 }
 
-export default function ChatArea({ context, initialMessages, conversationId, syncHistoryMessages }: Props) {
+export default function ChatArea({ context, initialMessages, conversationId, syncHistoryMessages, updateMessages }: Props) {
     const { data: session } = useSession();
     const { activeSubscription } = useGlobalContext();
-    const { updateConversation } = useConversationSaver();
+
     const { messages, input, handleInputChange, handleSubmit } = useChat({
         initialMessages,
         body: {
@@ -28,13 +28,15 @@ export default function ChatArea({ context, initialMessages, conversationId, syn
             conversationId: conversationId,
         },
         onFinish: async (message) => {
-            syncHistoryMessages([{ role: "user", content: input, id: (Date.now() * Math.random()).toString() }, message]);
-            await updateConversation({
-                conversationId,
-                newMessages: [{ role: "user", content: input }, message]
-            });
+            const newMessages: Message[] = [
+                { role: "user", content: input, id: 'temp-user-id' },
+                message
+            ];
+            syncHistoryMessages(newMessages);
+            await updateMessages(newMessages);
         }
     });
+
     const messagesEndRef = useChatScroll(messages);
 
     return (

@@ -3,11 +3,11 @@ import { NextResponse } from 'next/server';
 import { requireAuth } from '@/app/api/lib/auth-helper';
 import supabase from '@/lib/supabase';
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
     const auth = await requireAuth(req);
     if ('error' in auth) return auth.error;
     const userId = auth.userId;
-    const conversationId = params.id;
+    const conversationId = (await params).id;
 
     if (!conversationId) {
         return NextResponse.json({ error: 'Conversation ID is required' }, { status: 400 });

@@ -52,34 +52,7 @@ export const conversationService = {
             throw new Error('Could not fetch conversations.');
         }
 
-        if (!data) {
-            return [];
-        }
-
-        // Normalize the url field to always be an array
-        const normalizedData = data.map(conv => {
-            let urls: string[] = [];
-            if (Array.isArray(conv.url)) {
-                urls = conv.url;
-            } else if (typeof conv.url === 'string') {
-                try {
-                    // Handle cases where the array is stored as a JSON string
-                    const parsed = JSON.parse(conv.url);
-                    if (Array.isArray(parsed)) {
-                        urls = parsed;
-                    } else {
-                        // It's a string but not a JSON array, treat as single URL
-                        urls = [conv.url];
-                    }
-                } catch (e) {
-                    // Not a JSON string, treat as a single URL from a legacy format
-                    urls = [conv.url];
-                }
-            }
-            return { ...conv, url: urls };
-        });
-
-        return normalizedData;
+        return data || [];
     },
 
     async getConversationById(id: string): Promise<Conversation | null> {

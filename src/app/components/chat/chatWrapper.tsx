@@ -1,22 +1,32 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import LlmProcessing from "./llmProcessing";
 import ConversationHistory from "./conversationHistory";
-import { Conversation } from "@/app/types/types";
-import { useConversations } from "@/app/hooks/useConversations";
+import { useConversationsManager } from "@/app/hooks/state/useConversationsManager";
 
 export default function ChatWrapper() {
-    const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const { conversations, isLoading, error, syncHistoryMessages, setConversations, deleteConversation } = useConversations();
+    const {
+        conversations,
+        isLoading,
+        error,
+        deleteConversation,
+        activeConversationId,
+        setActiveConversationId,
+        syncHistoryMessages,
+        createConversation,
+        addSource,
+        updateMessages,
+        removeSource
+    } = useConversationsManager();
 
-    const handleSelectConversation = (conversation: Conversation) => {
-        setSelectedConversation(conversation);
-    };
+    const activeConversation = useMemo(() => {
+        return conversations.find(c => c.id === activeConversationId) || null;
+    }, [conversations, activeConversationId]);
 
     const handleNewConversation = () => {
-        setSelectedConversation(null);
+        setActiveConversationId(null);
     };
 
     const toggleSidebar = () => {
@@ -31,18 +41,20 @@ export default function ChatWrapper() {
                 conversations={conversations}
                 isLoading={isLoading}
                 error={error}
-                onSelectConversation={handleSelectConversation}
+                onSelectConversation={(conv) => setActiveConversationId(conv.id)}
                 onNewConversation={handleNewConversation}
                 onDeleteConversation={deleteConversation}
+                activeConversationId={activeConversationId}
             />
             <div className={`relative h-full flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-4/5' : 'w-full'}`}>
                 <LlmProcessing
-                    key={selectedConversation?.id || 'new'}
-                    initialConversation={selectedConversation}
-                    toggleSidebar={toggleSidebar}
-                    isSidebarOpen={isSidebarOpen}
-                    syncHistoryMessages={(messages) => selectedConversation && syncHistoryMessages(selectedConversation.id, messages)}
-                    setConversations={setConversations}
+                    key={activeConversationId || 'new'}
+                    initialConversation={activeConversation}
+                    syncHistoryMessages={syncHistoryMessages}
+                    onCreateConversation={createConversation}
+                    onAddSource={addSource}
+                    updateMessages={updateMessages}
+                    onRemoveSource={removeSource}
                 />
             </div>
         </div>
