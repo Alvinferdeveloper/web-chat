@@ -1,33 +1,13 @@
-import { NextResponse } from "next/server";
-import { getWebSummary } from "@/app/api/services/textProvider.service";
-import { scrappWeb } from "../services/scrapper.service";
 import { requireAuth } from '../lib/auth-helper';
+import { withErrorHandler, ApiResponse } from '../lib/api-helpers';
+import { WebContextService } from '../services/webContext.service';
 
-export async function POST(req: Request) {
-    const auth = await requireAuth(req);
-    if ('error' in auth) return auth.error;
+export const POST = withErrorHandler(async (req: Request) => {
+    await requireAuth(req);
 
     const { urls } = await req.json();
-    if (!urls || !Array.isArray(urls) || urls.length === 0) {
-        return NextResponse.json({ error: "Missing or invalid 'urls' array" }, { status: 422 });
-    }
-    try {
-        const context = await scrappWeb(urls);
-        
-        let summary = '';
-        if (urls.length === 1) {
-            try {
-                summary = await getWebSummary(context);
-            } catch (summaryError) {
-                console.warn('Could not generate summary for single URL:', summaryError);
-            }
-        }
+    
+    const { context, summary } = await WebContextService.generateContextAndSummary(urls);
 
-        return NextResponse.json({ context, summary });
-
-    } catch (err) {
-        const error = err as Error;
-        return NextResponse.json({ error: error.message }, { status: 400 });
-    }
-
-}
+    return ApiResponse.success({ context, summary });
+});

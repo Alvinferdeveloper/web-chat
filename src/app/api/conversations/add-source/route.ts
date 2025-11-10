@@ -1,57 +1,20 @@
-import { NextResponse } from 'next/server';
 import { requireAuth } from '@/app/api/lib/auth-helper';
-import { scrappWeb } from '@/app/api/services/scrapper.service';
-import supabase from '@/lib/supabase';
+import { withErrorHandler, ApiError, ApiResponse } from '@/app/api/lib/api-helpers';
+import { conversationService } from '@/app/api/services/conversation.service';
 
-export async function POST(req: Request) {
-    const auth = await requireAuth(req);
-    if ('error' in auth) return auth.error;
-
+export const POST = withErrorHandler(async (req: Request) => {
+    const { userId } = await requireAuth(req);
     const { conversationId, url } = await req.json();
 
     if (!conversationId || !url) {
-        return NextResponse.json(
-            { error: 'conversationId and url are required' },
-            { status: 422 }
-        );
+        throw new ApiError(422, 'conversationId and url are required');
     }
 
-    try {
-        const { data: conversation, error: findError } = await supabase
-            .from('conversations')
-            .select('context, user_id, url')
-            .eq('id', conversationId)
-            .single();
+    const { context } = await conversationService.addSource(conversationId, userId, url);
 
-        if (findError) throw findError;
-
-        if (!conversation) {
-            return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
-        }
-
-        if (conversation.user_id !== auth.userId) {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-        }
-        const newContent = await scrappWeb([url]);
-
-        const updatedContext = `${conversation.context}\n\n--- NUEVA FUENTE: ${url} ---\n\n${newContent}`;
-        const updatedUrl = [...(conversation.url || []), url];
-
-        const { error: updateError } = await supabase
-            .from('conversations')
-            .update({ context: updatedContext, url: updatedUrl })
-            .eq('id', conversationId);
-        if (updateError) throw updateError;
-
-        return NextResponse.json({
-            message: 'Source added successfully',
-            context: updatedContext,
-            conversationId: conversationId,
-        });
-
-    } catch (err) {
-        const error = err as Error;
-        console.error('Error adding source:', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-}
+    return ApiResponse.success({
+        message: 'Source added successfully',
+        context: context,
+        conversationId: conversationId,
+    });
+});

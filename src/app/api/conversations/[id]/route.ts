@@ -1,48 +1,16 @@
-
-import { NextResponse } from 'next/server';
 import { requireAuth } from '@/app/api/lib/auth-helper';
-import supabase from '@/lib/supabase';
+import { withErrorHandler, ApiError, ApiResponse } from '@/app/api/lib/api-helpers';
+import { conversationService } from '@/app/api/services/conversation.service';
 
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
-    const auth = await requireAuth(req);
-    if ('error' in auth) return auth.error;
-    const userId = auth.userId;
-    const conversationId = (await params).id;
+export const DELETE = withErrorHandler(async (req: Request, { params }: { params: { id: string } }) => {
+    const { userId } = await requireAuth(req);
+    const conversationId = params.id;
 
     if (!conversationId) {
-        return NextResponse.json({ error: 'Conversation ID is required' }, { status: 400 });
+        throw new ApiError(400, 'Conversation ID is required');
     }
 
-    try {
-        // Verify ownership before deleting
-        const { data: conversation, error: findError } = await supabase
-            .from('conversations')
-            .select('user_id')
-            .eq('id', conversationId)
-            .single();
+    await conversationService.deleteConversation(conversationId, userId);
 
-        if (findError) throw findError;
-
-        if (!conversation) {
-            return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
-        }
-
-        if (conversation.user_id !== userId) {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-        }
-
-        const { error: deleteError } = await supabase
-            .from('conversations')
-            .delete()
-            .eq('id', conversationId);
-
-        if (deleteError) throw deleteError;
-
-        return NextResponse.json({ message: 'Conversation deleted successfully' }, { status: 200 });
-
-    } catch (err) {
-        const error = err as Error;
-        console.error('Error deleting conversation:', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-}
+    return ApiResponse.message('Conversation deleted successfully');
+});

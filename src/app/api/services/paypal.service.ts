@@ -1,5 +1,6 @@
 // Usar require para importar el SDK de PayPal
 import * as paypal from '@paypal/checkout-server-sdk';
+import { ApiError } from '../lib/api-helpers';
 
 // Configuración del entorno de PayPal
 const configureEnvironment = () => {
@@ -40,8 +41,13 @@ export const PayPalService = {
       },
     });
 
-    const response = await client.execute(request);
-    return response.result;
+    try {
+      const response = await client.execute(request);
+      return response.result;
+    } catch (err: any) {
+      console.error('Error creating PayPal order:', err.statusCode, err.message);
+      throw new ApiError(err.statusCode || 500, err.message || 'Failed to create PayPal order');
+    }
   },
 
   captureOrder: async (orderId: string) => {
@@ -50,14 +56,24 @@ export const PayPalService = {
     // @ts-ignore - PayPal types are incorrect, empty object is valid here
     request.requestBody({});
 
-    const response = await client.execute(request);
-    return response.result;
+    try {
+      const response = await client.execute(request);
+      return response.result;
+    } catch (err: any) {
+      console.error('Error capturing PayPal order:', err.statusCode, err.message);
+      throw new ApiError(err.statusCode || 500, err.message || 'Failed to capture PayPal order');
+    }
   },
 
   getOrderDetails: async (orderId: string) => {
     // @ts-ignore - Ignorar errores de tipo para el constructor
     const request = new paypal.orders.OrdersGetRequest(orderId);
-    const response = await client.execute(request);
-    return response.result;
+    try {
+      const response = await client.execute(request);
+      return response.result;
+    } catch (err: any) {
+      console.error('Error getting PayPal order details:', err.statusCode, err.message);
+      throw new ApiError(err.statusCode || 500, err.message || 'Failed to get PayPal order details');
+    }
   }
 };

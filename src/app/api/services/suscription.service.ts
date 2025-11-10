@@ -1,14 +1,20 @@
 import supabase from "@/lib/supabase";
+import { ApiError } from "../lib/api-helpers";
+
 export class SuscriptionService {
     static async assignFreeSuscription(userId: string): Promise<string> {
-            const { data: freePlan } = await supabase
+            const { data: freePlan, error: freePlanError } = await supabase
                 .from('plan')
                 .select('id, tokens')
                 .eq('name', 'FREE')
                 .single();
 
+            if (freePlanError) {
+                throw new ApiError(500, `Error fetching free plan data: ${freePlanError.message}`);
+            }
+
             if (!freePlan) {
-                throw new Error("Free plan not found");
+                throw new ApiError(500, "Free plan not found in database.");
             }
 
             const startDate = new Date();
@@ -25,7 +31,7 @@ export class SuscriptionService {
                     status: 'ACTIVE'
                 }).select("id").single();
             if(error){
-                throw new Error(error.message);
+                throw new ApiError(500, `Error assigning free subscription: ${error.message}`);
             }
             return suscription?.id;
     }
@@ -36,6 +42,10 @@ export class SuscriptionService {
         .eq("plan_id", planId)
         .eq("user_id", userId)
         .eq("status", "ACTIVE");
+      
+      if (error) {
+        throw new ApiError(500, `Error checking for existing subscription: ${error.message}`);
+      }
       const exists = (count ?? 0) > 0;
       return exists;
     }
@@ -54,10 +64,8 @@ export class SuscriptionService {
                 status: 'ACTIVE'
             }).select("id").single();
         if(error){
-            throw new Error(error.message);
+            throw new ApiError(500, `Error adding subscription: ${error.message}`);
         }
         return data.id;
     }
-
-
 }

@@ -2,6 +2,7 @@ import supabase from '@/lib/supabase';
 import { Conversation } from '@/app/types/types';
 import { Message } from "ai/react"
 import { ApiError } from '../lib/api-helpers';
+import { scrappWeb } from './scrapper.service';
 
 type CreateMessage = Omit<Message, 'id' | 'conversation_id' | 'created_at'>;
 
@@ -96,5 +97,117 @@ export const conversationService = {
             console.error('Error appending messages:', insertError);
             throw new ApiError(500, 'Could not append messages to conversation.');
         }
+    },
+
+    async deleteConversation(conversationId: string, userId: string): Promise<void> {
+        // First, verify ownership
+        const { data: conversation, error: findError } = await supabase
+            .from('conversations')
+            .select('user_id')
+            .eq('id', conversationId)
+            .single();
+
+        if (findError && findError.code !== 'PGRST116') {
+            console.error('Error finding conversation to delete:', findError);
+            throw new ApiError(500, 'Error verifying conversation ownership.');
+        }
+
+        if (!conversation) {
+            throw new ApiError(404, 'Conversation not found.');
+        }
+
+        if (conversation.user_id !== userId) {
+            throw new ApiError(403, 'You do not have permission to delete this conversation.');
+        }
+
+        // If ownership is verified, proceed with deletion
+        const { error: deleteError } = await supabase
+            .from('conversations')
+            .delete()
+            .eq('id', conversationId);
+
+        if (deleteError) {
+            console.error('Error deleting conversation:', deleteError);
+            throw new ApiError(500, 'Could not delete conversation.');
+        }
+    },
+
+    async addSource(conversationId: string, userId: string, newUrl: string): Promise<{ context: string }> {
+        // 1. Verify ownership
+        const { data: conversation, error: findError } = await supabase
+            .from('conversations')
+            .select('user_id, context, url')
+            .eq('id', conversationId)
+            .single();
+
+        if (findError && findError.code !== 'PGRST116') {
+            throw new ApiError(500, 'Error verifying conversation ownership.');
+        }
+
+        if (!conversation) {
+            throw new ApiError(404, 'Conversation not found.');
+        }
+
+        if (conversation.user_id !== userId) {
+            throw new ApiError(403, 'You do not have permission to modify this conversation.');
+        }
+
+        const newContent = await scrappWeb([newUrl]);
+
+        const updatedContext = `${conversation.context}\n\n--- NUEVA FUENTE: ${newUrl} ---\n\n${newContent}`;
+        const updatedUrl = [...(conversation.url || []), newUrl];
+
+        const { error: updateError } = await supabase
+            .from('conversations')
+            .update({ context: updatedContext, url: updatedUrl })
+            .eq('id', conversationId);
+
+        if (updateError) {
+            throw new ApiError(500, 'Could not add new source to conversation.');
+        }
+
+        return { context: updatedContext };
+    },
+
+    async removeSource(conversationId: string, userId: string, urlToRemove: string): Promise<Conversation> {
+        // 1. Verify ownership
+        const { data: conversation, error: findError } = await supabase
+            .from('conversations')
+            .select('user_id, url')
+            .eq('id', conversationId)
+            .single();
+
+        if (findError && findError.code !== 'PGRST116') {
+            throw new ApiError(500, 'Error verifying conversation ownership.');
+        }
+
+        if (!conversation) {
+            throw new ApiError(404, 'Conversation not found.');
+        }
+
+        if (conversation.user_id !== userId) {
+            throw new ApiError(403, 'You do not have permission to modify this conversation.');
+        }
+
+        // 2. Filter URLs and regenerate context
+        const updatedUrls = (conversation.url || []).filter((u: string) => u !== urlToRemove);
+        let updatedContext = '';
+        if (updatedUrls.length > 0) {
+            updatedContext = await scrappWeb(updatedUrls);
+        }
+
+        // 3. Update the database
+        const { data: updatedConversation, error: updateError } = await supabase
+            .from('conversations')
+            .update({ context: updatedContext, url: updatedUrls })
+            .eq('id', conversationId)
+            .select()
+            .single();
+
+        if (updateError) {
+            throw new ApiError(500, 'Could not remove source from conversation.');
+        }
+
+        return updatedConversation;
     },
 };

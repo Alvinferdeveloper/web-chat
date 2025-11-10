@@ -2,6 +2,7 @@ import { generateText, streamText, } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { chatPrompt } from "../../prompts/chat";
 import { webSummarizerPrompt } from "../../prompts/summarizer";
+import { ApiError } from "../lib/api-helpers";
 
 const model = createGoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY })
 export async function getWebSummary(webInfo: string) {
@@ -14,7 +15,7 @@ export async function getWebSummary(webInfo: string) {
     }
     catch (err) {
         console.error(err);
-        throw new Error("An error occurred: verify that you have enough tokens or wait for the service to be restored");
+        throw new ApiError(500, "An error occurred: verify that you have enough tokens or wait for the service to be restored");
     }
 }
 
@@ -28,6 +29,6 @@ export async function askModel(messages: any, context: string) {
         return result;
     }
     catch (err) {
-        throw new Error("An error occurred: verify that you have enough tokens or wait for the service to be restored");
+        throw new ApiError(500, "An error occurred: verify that you have enough tokens or wait for the service to be restored");
     }
 }

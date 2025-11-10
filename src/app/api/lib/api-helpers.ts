@@ -25,7 +25,7 @@ export const ApiResponse = {
   },
 };
 
-type ApiHandler = (req: Request, params: { params: any }) => Promise<NextResponse>;
+type ApiHandler = (req: Request, params: { params: any }) => Promise<NextResponse | Response>;
 
 /**
  * A higher-order function that wraps an API route handler to provide

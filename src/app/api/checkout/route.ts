@@ -1,42 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { PlanService } from '../services/plan.service';
 import { SuscriptionService } from '../services/suscription.service';
 import { PayPalService } from '../services/paypal.service';
 import { requireAuth } from '../lib/auth-helper';
+import { withErrorHandler, ApiError, ApiResponse } from '../lib/api-helpers';
 
-export async function POST(req: NextRequest) {
-    const auth = await requireAuth(req);
-    if ('error' in auth) return auth.error;
-    
+export const POST = withErrorHandler(async (req: Request) => {
+    const { userId } = await requireAuth(req);
+
     const { planId } = await req.json();
-    const userId = auth.userId;
 
     const plan = await PlanService.getPlanById(planId);
-    if (!plan) {
-        return NextResponse.json({ error: "Plan not found" }, { status: 404 });
-    }
 
-    const subscriptionExists = await SuscriptionService.suscriptionExists(planId, userId);
+    const subscriptionExists = await SuscriptionService.suscriptionExists(plan.id, userId);
     if (subscriptionExists) {
-        return NextResponse.json({ error: "Subscription already exists" }, { status: 400 });
+        throw new ApiError(400, "Subscription already exists for this plan.");
     }
 
-    try {
-        // Crear la orden de PayPal
-        const order = await PayPalService.createOrder(
-            plan.price,
-            plan.id,
-            userId
-        );
+    const order = await PayPalService.createOrder(
+        plan.price,
+        plan.id.toString(),
+        userId
+    );
 
-        return NextResponse.json({
-            paypalOrderId: order.id,
-            paypalClientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
-        });
-    } catch (error) {
-        return NextResponse.json(
-            { error: 'Failed to create PayPal order' },
-            { status: 500 }
-        );
-    }
-}
+    return ApiResponse.success({
+        paypalOrderId: order.id,
+        paypalClientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
+    });
+});
