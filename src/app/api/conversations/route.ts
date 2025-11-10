@@ -1,79 +1,52 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { conversationService } from '../services/conversation.service';
 import { requireAuth } from '../lib/auth-helper';
+import { withErrorHandler, ApiError, ApiResponse } from '../lib/api-helpers';
 
-export async function POST(req: Request) {
-    const auth = await requireAuth(req);
-    if ('error' in auth) return auth.error;
-    const userId = auth.userId;
+export const POST = withErrorHandler(async (req: Request) => {
+    const { userId } = await requireAuth(req);
 
-    try {
-        const body = await req.json();
-        const { url, summary, context, title } = body;
+    const body = await req.json();
+    const { url, summary, context, title } = body;
 
-        if (!url || !summary || !context) {
-            return NextResponse.json({ error: 'Missing required fields: url, summary, context' }, { status: 400 });
-        }
-
-        const newConversation = await conversationService.createConversation({
-            userId,
-            url,
-            summary,
-            context,
-            title,
-        });
-
-        return NextResponse.json(newConversation, { status: 201 });
-
-    } catch (error) {
-        console.error('Error creating conversation:', error);
-        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-        return NextResponse.json({ error: 'Failed to create conversation', details: errorMessage }, { status: 500 });
+    if (!url || !summary || !context) {
+        throw new ApiError(400, 'Missing required fields: url, summary, context');
     }
-}
 
-export async function PUT(req: Request) {
-    const auth = await requireAuth(req);
-    if ('error' in auth) return auth.error;
-    const userId = auth.userId;
+    const newConversation = await conversationService.createConversation({
+        userId,
+        url,
+        summary,
+        context,
+        title,
+    });
 
-    try {
-        const body = await req.json();
-        const { conversationId, newMessages } = body;
+    return ApiResponse.success(newConversation, 201);
+});
 
-        if (!conversationId || !newMessages || !Array.isArray(newMessages) || newMessages.length === 0) {
-            return NextResponse.json({ error: 'Missing required fields for message append: conversationId and newMessages' }, { status: 400 });
-        }
+export const PUT = withErrorHandler(async (req: Request) => {
+    const { userId } = await requireAuth(req);
 
-        const existingConversation = await conversationService.getConversationById(conversationId);
-        if (!existingConversation || existingConversation.user_id !== userId) {
-            return NextResponse.json({ error: 'Unauthorized or Conversation not found' }, { status: 403 });
-        }
-        await conversationService.appendMessagesToConversation(conversationId, newMessages);
+    const body = await req.json();
+    const { conversationId, newMessages } = body;
 
-        return NextResponse.json({ message: 'Messages appended successfully' }, { status: 200 });
-
-    } catch (error) {
-        console.error('Error appending messages to conversation:', error);
-        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-        return NextResponse.json({ error: 'Failed to append messages', details: errorMessage }, { status: 500 });
+    if (!conversationId || !newMessages || !Array.isArray(newMessages) || newMessages.length === 0) {
+        throw new ApiError(400, 'Missing required fields for message append: conversationId and newMessages');
     }
-}
 
-export async function GET(req: Request) {
-    const auth = await requireAuth(req);
-    if ('error' in auth) return auth.error;
-    const userId = auth.userId;
-
-    try {
-        const conversations = await conversationService.getConversationsByUserId(userId);
-        return NextResponse.json(conversations);
-
-    } catch (error) {
-        console.error('Error fetching conversations:', error);
-        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-        return NextResponse.json({ error: 'Failed to fetch conversations', details: errorMessage }, { status: 500 });
+    const existingConversation = await conversationService.getConversationById(conversationId);
+    if (existingConversation.user_id !== userId) {
+        throw new ApiError(403, 'Unauthorized');
     }
-}
+
+    await conversationService.appendMessagesToConversation(conversationId, newMessages);
+
+    return ApiResponse.message('Messages appended successfully');
+});
+
+export const GET = withErrorHandler(async (req: Request) => {
+    const { userId } = await requireAuth(req);
+
+    const conversations = await conversationService.getConversationsByUserId(userId);
+    return ApiResponse.success(conversations);
+});

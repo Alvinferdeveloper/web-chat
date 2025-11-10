@@ -29,11 +29,11 @@ export default function ChatArea({ context, initialMessages, conversationId, syn
         },
         onFinish: async (message) => {
             const newMessages: Message[] = [
-                { role: "user", content: input, id: 'temp-user-id' },
+                { role: "user", content: input, id: message.id },
                 message
             ];
             syncHistoryMessages(newMessages);
-            await updateMessages(newMessages);
+            updateMessages(newMessages);
         }
     });
 

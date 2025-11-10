@@ -1,6 +1,7 @@
 import supabase from '@/lib/supabase';
 import { Conversation } from '@/app/types/types';
 import { Message } from "ai/react"
+import { ApiError } from '../lib/api-helpers';
 
 type CreateMessage = Omit<Message, 'id' | 'conversation_id' | 'created_at'>;
 
@@ -28,7 +29,7 @@ export const conversationService = {
 
         if (conversationError) {
             console.error('Error creating conversation:', conversationError);
-            throw new Error('Could not create conversation.');
+            throw new ApiError(500, 'Could not create conversation in database.');
         }
 
         return {
@@ -49,13 +50,13 @@ export const conversationService = {
 
         if (error) {
             console.error('Error fetching conversations:', error);
-            throw new Error('Could not fetch conversations.');
+            throw new ApiError(500, 'Could not fetch conversations.');
         }
 
         return data || [];
     },
 
-    async getConversationById(id: string): Promise<Conversation | null> {
+    async getConversationById(id: string): Promise<Conversation> {
         const { data, error } = await supabase
             .from('conversations')
             .select(`
@@ -65,12 +66,13 @@ export const conversationService = {
             .eq('id', id)
             .single();
 
-        if (error) {
+        if (error && error.code !== 'PGRST116') {
             console.error('Error fetching conversation:', error);
-            if (error.code === 'PGRST116') {
-                return null;
-            }
-            throw new Error('Could not fetch conversation.');
+            throw new ApiError(500, 'Could not fetch conversation.');
+        }
+
+        if (!data) {
+            throw new ApiError(404, 'Conversation not found.');
         }
 
         return data;
@@ -92,7 +94,7 @@ export const conversationService = {
 
         if (insertError) {
             console.error('Error appending messages:', insertError);
-            throw new Error('Could not append messages to conversation.');
+            throw new ApiError(500, 'Could not append messages to conversation.');
         }
     },
 };
